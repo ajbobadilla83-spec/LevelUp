@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Persuasive Writing Helper</title>
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script crossorigin src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f3f4f6; margin: 0; padding: 20px; }
+    .wrap { max-width: 1100px; margin: 0 auto; background: #fff; padding: 16px; border-radius: 8px; }
+    .card { border: 1px solid #e5e7eb; padding: 12px; border-radius: 8px; margin-bottom: 20px; }
+    .two { display: flex; gap: 12px; flex-wrap: wrap; }
+    .left { width: 40%; background: #fff7ed; padding: 8px; border-left: 6px solid #f97316; border-radius: 6px; }
+    .right { flex: 1; min-width: 300px; }
+    label { display: block; font-weight: 700; margin-top: 8px; }
+    textarea { width: 100%; min-height: 48px; padding: 8px; border-radius: 6px; border: 2px solid #e5e7eb; }
+    textarea.s1 { background: #FFF9C4; border-color: #FDD835; }
+    textarea.s2 { background: #E6F4EA; border-color: #34D399; }
+    textarea.s3.p1 { background: #FEE2E2; border-color: #EF4444; }
+    textarea.s3.p2 { background: #E0F2FE; border-color: #60A5FA; }
+    textarea.s3.p3 { background: #EDE9FE; border-color: #7C3AED; }
+    textarea.s3.p4 { background: #FCE7F3; border-color: #EC4899; }
+    textarea.s3.p5 { background: #FFF7ED; border-color: #F97316; }
+    .btns { margin-top: 8px; display: flex; gap: 8px; flex-wrap: wrap; }
+    .fb { background: #f8fafc; padding: 8px; margin-top: 8px; border-radius: 6px; }
+    .helper { font-size: 0.9em; color: #374151; margin: 4px 0 10px 0; }
+    .hagll { font-style: italic; margin: 2px 0 6px 0; }
+    button { padding: 6px 12px; border: none; border-radius: 6px; cursor: pointer; }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+    .done { background: #22c55e; color: white; }
+
+    /* New styles for the prompt box */
+    .prompt-container { max-width: 1000px; margin: 20px auto; padding: 20px; border: 2px solid #000; border-radius: 8px; background: #fff; }
+    .prompt-title { text-align: center; color: #000; margin-bottom: 10px; }
+    .prompt-position { text-align: center; color: #DC2626; font-size: 1.2em; font-weight: 700; margin-bottom: 15px; }
+    .argument-point { background: #F3F4F6; padding: 10px; border-radius: 6px; margin-bottom: 8px; border-left: 4px solid #F97316; }
+    .argument-list { display: flex; gap: 15px; justify-content: space-around; flex-wrap: wrap; }
+  </style>
+</head>
+<body>
+  
+<div class="prompt-container">
+  <h1 class="prompt-title">Persuasive Writing Challenge: Island Survival</h1>
+  <p style="margin-bottom: 10px;">**Scenario:** Imagine a young child is stranded alone on a deserted island (left image: crying, no proper shelter, struggle for fire/food). Then imagine the same child with a resourceful adult (right image: smiling, sturdy treehouse, successful fire and raft).</p>
+  <p class="prompt-position">Your Position: **No kid can survive on an island without an adult.**</p>
+
+  <div style="display: flex; gap: 20px; align-items: flex-start; flex-wrap: wrap;">
+    <div style="flex: 1; min-width: 250px; text-align: center;">
+      <img src="promtp-child-in-island.jpg" alt="Child on an island" style="max-width:100%; border-radius: 8px; border: 1px solid #ccc;" />
+    </div>
+    <div style="flex: 1; min-width: 250px;">
+      <div class="argument-point">
+        **Argument 1: Complex Shelter Construction**
+        <p style="font-size: 0.9em; margin: 5px 0 0 0;">(Building a strong, protective treehouse or shelter requires adult strength, tools, and construction knowledge.)</p>
+      </div>
+      <div class="argument-point">
+              **Argument 2: Fire, Water & Food**
+              <p style="font-size: 0.9em; margin: 5px 0 0 0;">(An adult has the knowledge to sustain fire, purify water, and consistently forage/fish for food.)</p>
+          </div>
+          <div class="argument-point">
+              **Argument 3: Rescue/Escape (Raft Building)**
+              <p style="font-size: 0.9em; margin: 5px 0 0 0;">(Building a seaworthy raft requires adult strength, knowledge of knots, and planning for escape.)</p>
+          </div>
+      </div>
+    </div>
+  </div>
+
+  <p style="text-align: center; margin-top: 25px;">**SCROLL DOWN** to use the Persuasive Writing Helper to structure your essay based on this position.</p>
+</div>
+
+  <div id="root"></div>
+  <script type="text/babel">
+
+// Utility: run simple grammar checks
+function grammarChecks(sentence, idx, paraIndex){
+  const feedback = [];
+  const trimmed = sentence.trim();
+
+  if(!trimmed) {
+    feedback.push("⚠️ Sentence missing.");
+    return feedback;
+  }
+
+  // Capitalisation
+  if(trimmed[0] !== trimmed[0]?.toUpperCase()){
+    feedback.push("⚠️ Sentence should start with a capital letter.");
+  } else {
+    feedback.push("✅ Starts with a capital letter.");
+  }
+
+  // Ending punctuation
+  if(!/[.?!]$/.test(trimmed)){
+    feedback.push("⚠️ Add punctuation at the end of the sentence.");
+  } else {
+    feedback.push("✅ Ends with correct punctuation.");
+  }
+
+  // General conjunctions
+  if(!/\b(because|and|but|so|although)\b/i.test(trimmed)){
+    feedback.push("⚠️ Try using a conjunction (because, but, and, so).");
+  }
+
+  // Sentence completeness heuristic
+  if(trimmed.split(" ").length < 3){
+    feedback.push("⚠️ Sentence may be too short — add more detail.");
+  }
+
+  // Adjectives / descriptive words (Simplified check to avoid over-correction)
+  if(trimmed.split(" ").length > 5 && !/\b(great|terrible|safe|vital|important|difficult|skilled)\b/i.test(trimmed)){
+    feedback.push("⚠️ Consider adding a descriptive word (adjective/adverb) to enhance your writing.");
+  }
+
+  // Paragraph-specific checks
+  if(paraIndex === 0){
+    // Check for S1 (Where, What) - Must state an opinion/stand
+    if(idx === 0 && !/\b(must|should|agree|believe|concur|accept|recognise)\b/i.test(trimmed)){
+      feedback.push("⚠️ Ensure your sentence states an **opinion or stand** on the topic (Where and What).");
+    }
+    // Check for S2 (You must) - Include strong opinion words
+    if(idx === 1 && !/\b(must|should)\b/i.test(trimmed)){
+      feedback.push("⚠️ Include strong opinion words like 'must' or 'should'.");
+    }
+  }
+
+  if(paraIndex === 1 && idx === 1 && !/\bbecause\b/i.test(trimmed)){
+    feedback.push("⚠️ Include 'because' to explain your reason.");
+  }
+  // Simplified check for S3 in argument paragraphs
+  if((paraIndex === 1 || paraIndex === 2 || paraIndex === 3) && idx === 2){
+    if (!/([?!]|tragic|heartbreaking|we|us|our|together|example|study|experts|adults|survival)/i.test(trimmed)){
+      feedback.push("⚠️ Sentence 3 should be a strong finisher: try a rhetorical question, emotive language, or evidence.");
+    }
+  }
+  
+  if(paraIndex === 4){
+    if(idx === 0 && !/\b(In conclusion|For these reasons|This is why)\b/i.test(trimmed)){
+      feedback.push("⚠️ Start with 'In conclusion' or 'For these reasons'.");
+    }
+    if(idx === 2 && !/\b(act now|together|let's|make the right choice|must)\b/i.test(trimmed)){
+      feedback.push("⚠️ Add a call to action (e.g. We must act now, Let's...).");
+    }
+  }
+
+  return feedback;
+}
+
+
+// Common helper structure for Sentence 3 in Argument Paragraphs (P2, P3, P4)
+const argumentS3Helpers = {
+    type: 'group',
+    content: [
+      {title: "Rhetorical Question Examples", text: "Don't we all deserve a clean environment? Who wouldn’t want animals to be safe? Isn’t it time we acted responsibly?"},
+      {title: "Emotive Language", text: "tragic, heartbreaking, devastating, misfortune, disaster, suffering"},
+      {title: "Hyperboles/Exaggeration", text: "millions of times, countless, forever, out of this world, a tragedy"},
+      {title: "Inclusive Language Samples", text: "we, us, together, our, let's, we must, our life depends on this"}
+    ]
+};
+
+// Evidence-based helper for P4 (Sentence 3) and Conclusion P5 (Sentence 2)
+const s3EvidenceAndTechniquesHelper = {
+    type: 'group',
+    content: [
+      {title: "Show Evidence", text: "For example, According to, A recent study found, Last year my cousin saw, Experts say"},
+      {title: "Emotive Language", text: "tragic, heartbreaking, devastating, misfortune, disaster, suffering"},
+      {title: "Hyperboles/Exaggeration", text: "millions of times, countless, forever, out of this world, a tragedy"},
+      {title: "Inclusive Language Samples", text: "we, us, together, our, let's, we must, our life depends on this"}
+    ]
+};
+
+
+const paragraphData = [
+  {
+    title: "Paragraph 1 — Statement of Position",
+    // Zoo/Freedom Examples
+    hagll: [
+      "Zoos are terrible places because they deny animals the fundamental right to be free.",
+      "You must absolutely recognise that caging intelligent animals is morally wrong and fundamentally cruel.",
+      "Who would lock a beautiful lion in a tiny, artificial enclosure?"
+    ],
+    prompts: [
+      "Sentence 1: Where, What (State your stand/opinion)",
+      "Sentence 2: You must ________ ______ that… (explain your opinion on sentence 1 and be convincing)",
+      "Sentence 3: **Reader Engagement Sentence**" 
+    ],
+    helpers: [
+      // S1 Helpers
+      "Subordinating Conjunctions (use to expand your sentence): because, so, however, although, while",
+      // S2 Helpers
+      {
+        type: 'group',
+        content: [
+          {title: "High Modality Words", text: "certainly, undoubtedly, definitely, absolutely, undeniably, must, should, cannot"},
+          {title: "Verbs of Agreement", text: "agree, believe, concur, accept, recognise"}
+        ]
+      },
+      // S3 Helpers (P1) - Restored 'Simple Transition' box
+      {
+        type: 'group',
+        content: [
+          {title: "Rhetorical Question Examples", text: "Who wouldn’t want children to be safe? Is survival possible alone?"},
+          {title: "Emotive/Inclusive Language", text: "terrifying, desperate, alone, abandoned; we, us, together, our"},
+          {title: "Hyperboles/Exaggeration", text: "impossible, certain death, doomed, countless hours"},
+          {title: "Simple Transition", text: "Read on to discover why and you will understand..."}
+        ]
+      }
+    ]
+  },
+  {
+    title: "Paragraph 2 — Argument 1 (Shelter)",
+    // Zoo/Freedom Examples
+    hagll: [
+      "Firstly, you must understand that zoo enclosures do not provide the vital space animals need to thrive.",
+      "This is critical because animals like elephants and tigers walk huge distances in the wild, so keeping them in small spaces causes profound physical and mental suffering.",
+      "Is it fair to deny these creatures the ability to roam freely?"
+    ],
+    prompts: [
+      "Firstly, you must understand/realise/recognise/appreciate that…",
+      "This is __________ because…",
+      "Rhetorical Question (or other technique)"
+    ],
+    helpers: [
+      null,
+      "Word bank: important, significant, critical, fundamental, essential, vital",
+      argumentS3Helpers
+    ]
+  },
+  {
+    title: "Paragraph 3 — Argument 2 (Fire, Water & Food)",
+    // Zoo/Freedom Examples
+    hagll: [
+      "Secondly, you must consider the devastating impact zoos have on the mental health and social structures of animals.",
+      "This is essential because many animals, such as primates, have complex family bonds that are often destroyed in captivity, leading to tragic behaviors like pacing and self-harm.",
+      "It is heartbreaking to watch a magnificent gorilla staring blankly at a concrete wall."
+    ],
+    prompts: [
+      "Secondly, you must understand/realise/recognise/appreciate that…",
+      "This is __________ because…",
+      "Emotive / Inclusive / Exaggeration (or other technique)"
+    ],
+    helpers: [
+      null,
+      "Word bank: important, significant, critical, fundamental, essential, vital",
+      argumentS3Helpers
+    ]
+  },
+  {
+    title: "Paragraph 4 — Argument 3 (Rescue/Escape)",
+    // Zoo/Freedom Examples
+    hagll: [
+      "Thirdly, you must also consider the false notion that zoos provide valuable education.",
+      "This is important because watching bored, listless animals in artificial habitats teaches children nothing about their natural behaviours, so it is a waste of time and money.",
+      "For example, experts agree that documentary footage and virtual reality offer a far more accurate and respectful view of wildlife in their natural environment."
+    ],
+    prompts: [
+      "Thirdly, you must understand/realise/recognise/appreciate that…",
+      "This is __________ because…",
+      "Show Evidence (or other technique)"
+    ],
+    helpers: [
+      null,
+      "Word bank: important, significant, critical, fundamental, essential, vital",
+      s3EvidenceAndTechniquesHelper
+    ]
+  },
+  {
+    title: "Paragraph 5 — Conclusion",
+    // Zoo/Freedom Examples
+    hagll: [
+      "In conclusion, for all these reasons, we must stop supporting the cruel industry of keeping animals captive in zoos.",
+      "Their well-being depends on our choices, so together we must recognize that freedom is not ours to take away.",
+      "We must act now to close zoos and relocate all animals to vast, natural reserves."
+    ],
+    prompts: [
+      "Restate your opinion or position from paragraph 1",
+      "Select your persuasive technique", 
+      "Final call to action"
+    ],
+    helpers: [
+      "Sentence starters: In conclusion…, For these reasons…, This is why…",
+      s3EvidenceAndTechniquesHelper, 
+      "Examples: We must act now…, Together we can…, Let’s make the right choice…"
+    ]
+  }
+];
+
+function App(){
+  const [data, setData] = React.useState(()=> paragraphData.map(p=>({...p, inputs:["","",""], preview:"", fb:[[],[],[]], stage:0})));
+
+  function upd(i,j,v){
+    const c = [...data];
+    c[i].inputs[j] = v;
+    setData(c);
+  }
+  function check(i){
+    const c = [...data];
+    const [s1,s2,s3] = c[i].inputs;
+    c[i].fb = [
+      grammarChecks(s1,0,i),
+      grammarChecks(s2,1,i),
+      grammarChecks(s3,2,i)
+    ];
+    c[i].preview = [s1,s2,s3].filter(Boolean).join(" ");
+    c[i].stage = 1;
+    setData(c);
+  }
+  function speak(i,text){
+    if(!window.speechSynthesis) return;
+    const u = new SpeechSynthesisUtterance(text);
+    u.rate = 0.95;
+    window.speechSynthesis.speak(u);
+    const c = [...data];
+    c[i].stage = 2;
+    setData(c);
+  }
+  function copy(i,text){
+    navigator.clipboard.writeText(text);
+    alert("Copied!");
+    const c = [...data];
+    c[i].stage = 3;
+    setData(c);
+  }
+  
+  // HelperDisplay component for cleaner helper box rendering
+  const HelperDisplay = ({ helper, sentenceIndex }) => {
+    if (!helper) return null;
+    if (typeof helper === 'string') {
+      return <div className="helper" style={{border: '1px dashed #ccc', padding: '6px', borderRadius: '4px'}}>{helper}</div>;
+    }
+    if (helper.type === 'group') {
+      return (
+        <div className="helper-group" style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '4px', marginBottom: '10px' }}>
+          {helper.content.map((box, index) => (
+            <div key={index} className="helper-box" style={{ padding: '6px', border: '1px solid #bbb', borderRadius: '4px', background: '#fafafa', fontSize: '0.85em', flex: 1, minWidth: '150px' }}>
+              <strong>{box.title}:</strong> {box.text}
+            </div>
+          ))}
+        </div>
+      );
+    }
+    return null;
+  };
+  
+
+  return (
+    <div className="wrap">
+      <h1>Persuasive Writing Helper</h1>
+      {data.map((p,i)=>(
+        <div key={i} className="card">
+          <h2>{p.title}</h2>
+          <div className="two">
+            <div className="left">
+              <h3>How a good one looks like</h3>
+              <p className="hagll" style={{background:"#FFF9C4"}}>{p.hagll[0]}</p>
+              <p className="hagll" style={{background:"#E6F4EA"}}>{p.hagll[1]}</p>
+              <p className="hagll" style={{background:["#FEE2E2","#E0F2FE","#EDE9FE","#FCE7F3","#FFF7ED"][i]}}>{p.hagll[2]}</p>
+            </div>
+            <div class="right">
+              <label>{p.prompts[0]}</label>
+              <textarea spellCheck="true" className="s1" value={p.inputs[0]} onChange={e=>upd(i,0,e.target.value)} />
+              {/* Using the HelperDisplay component for the simple string helpers */}
+              <HelperDisplay helper={p.helpers[0]} sentenceIndex={0} />
+
+              <label>{p.prompts[1]}</label>
+              <textarea spellCheck="true" className="s2" value={p.inputs[1]} onChange={e=>upd(i,1,e.target.value)} />
+              <HelperDisplay helper={p.helpers[1]} sentenceIndex={1} />
+              
+              <label dangerouslySetInnerHTML={{__html: p.prompts[2].replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')}} />
+              <textarea spellCheck="true" className={"s3 p"+(i+1)} value={p.inputs[2]} onChange={e=>upd(i,2,e.target.value)} />
+              <HelperDisplay helper={p.helpers[2]} sentenceIndex={2} />
+
+              <div className="btns">
+                <button onClick={()=>check(i)} className={p.stage>=1 ? "done" : ""}>
+                  {p.stage>=1 ? "✓ Checked" : "Check"}
+                </button>
+                <button disabled={p.stage<1} onClick={()=>speak(i,p.preview||p.hagll.join(" "))} className={p.stage>=2 ? "done" : ""}>
+                  {p.stage>=2 ? "✓ Read" : "Read aloud"}
+                </button>
+                <button disabled={p.stage<2} onClick={()=>copy(i,p.preview||p.hagll.join(" "))} className={p.stage>=3 ? "done" : ""}>
+                  {p.stage>=3 ? "✓ Copied" : "Copy"}
+                </button>
+              </div>
+              <div className="fb">
+                {p.fb.map((fbList,si)=>(
+                  <div key={si}>
+                    <strong>Sentence {si+1} Feedback:</strong>
+                    <ul>{fbList.map((f,idx)=><li key={idx}>{f}</li>)}</ul>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+
+  </script>
+</body>
+</html>
