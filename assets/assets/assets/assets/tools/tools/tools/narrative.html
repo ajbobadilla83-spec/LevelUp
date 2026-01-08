@@ -1,0 +1,1574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Narrative Writing Helper – Mystery Story</title>
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script crossorigin src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #e5e7eb;
+      margin: 0;
+      padding: 20px;
+      color: #0f172a;
+    }
+    .wrap {
+      max-width: 1300px;
+      margin: 0 auto;
+      background: #ffffff;
+      padding: 24px;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+    }
+    h1, h2, h3, h4 {
+      margin-top: 0;
+    }
+
+    /* Header / narrative path */
+    .coaster-wrapper {
+      margin-bottom: 24px;
+    }
+    .coaster-title {
+      font-size: 1.4em;
+      font-weight: 700;
+      margin-bottom: 8px;
+      text-align: center;
+    }
+    .coaster-svg {
+      display: block;
+      width: 100%;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    /* Planner */
+    .planner {
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 24px;
+      background: #000000;
+      color: #f9fafb;
+    }
+    .planner h3 {
+      margin-bottom: 6px;
+    }
+    .planner p.info {
+      font-size: 0.9em;
+      margin-top: 0;
+      margin-bottom: 10px;
+      color: #e5e7eb;
+    }
+    .plot-line {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 8px;
+    }
+    .plot-step {
+      flex: 1;
+      min-width: 220px;
+      background: #e5e7eb;
+      border-radius: 14px;
+      padding: 10px 12px;
+      border: 1px solid #cbd5f5;
+      color: #0f172a;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .plot-step-title {
+      font-weight: 700;
+      font-size: 0.9em;
+      margin-bottom: 2px;
+    }
+    .plot-subquestion {
+      margin-bottom: 4px;
+    }
+    .plot-question-text {
+      font-size: 0.85em;
+      margin-bottom: 2px;
+      color: #374151;
+    }
+    .plot-subquestion textarea {
+      width: 100%;
+      border-radius: 8px;
+      background: #f9fafb;
+      min-height: 40px;
+      padding: 6px;
+      border: 1px solid #d1d5db;
+      font-family: inherit;
+      font-size: 0.9em;
+      resize: vertical;
+      display: block;
+    }
+
+    /* Cards */
+    .card {
+      border: 1px solid #e5e7eb;
+      padding: 16px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      background: #ffffff;
+    }
+    /* Thick coloured outlines for each narrative section */
+    .card-intro {
+      border-width: 4px;
+      border-color: #FACC15;  /* yellow – introduction */
+    }
+    .card-raising {
+      border-width: 4px;
+      border-color: #F97316;  /* orange – raising action */
+    }
+    .card-climax {
+      border-width: 4px;
+      border-color: #B91C1C;  /* dark red – climax */
+    }
+    .card-falling {
+      border-width: 4px;
+      border-color: #22C55E;  /* green – falling action */
+    }
+    .card-resolution {
+      border-width: 4px;
+      border-color: #3B82F6;  /* blue – resolution */
+    }
+
+    .card h3 {
+      margin-bottom: 4px;
+    }
+    .card p.subtitle {
+      font-size: 0.9em;
+      margin-top: 0;
+      margin-bottom: 10px;
+    }
+
+    .intro-layout {
+      display: grid;
+      grid-template-columns: 1.1fr 1.4fr 1.5fr;
+      gap: 16px;
+      align-items: flex-start;
+    }
+    @media (max-width: 1000px) {
+      .intro-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Column 1 – Sentence descriptions */
+    .sentence-strip {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .sentence-tile {
+      border-radius: 6px;
+      padding: 6px 8px;
+      font-size: 0.85em;
+      font-weight: 600;
+      border: 1px solid transparent;
+    }
+    .tile-s1 { background: #FEF9C3; border-color: #FACC15; }
+    .tile-s2 { background: #DCFCE7; border-color: #22C55E; }
+    .tile-s3 { background: #FCE7F3; border-color: #EC4899; }
+    .tile-s4 { background: #E0F2FE; border-color: #38BDF8; }
+
+    /* HAGPLL */
+    .hagpll-box {
+      border-radius: 8px;
+      padding: 10px;
+      background: #f8fafc;
+      border: 1px solid #e5e7eb;
+    }
+    .hagpll-text {
+      font-size: 1.4em;
+      line-height: 1.6;
+    }
+    .hagpll-s1 { background: #FEF9C3; }
+    .hagpll-s2 { background: #DCFCE7; }
+    .hagpll-s3 { background: #FCE7F3; }
+    .hagpll-s4 { background: #E0F2FE; }
+
+    /* Student input */
+    .intro-right label {
+      display: block;
+      font-weight: 700;
+      margin-top: 6px;
+      font-size: 0.9em;
+    }
+    textarea {
+      width: 100%;
+      padding: 8px;
+      border-radius: 6px;
+      border: 2px solid #e5e7eb;
+      resize: vertical;
+      font-family: inherit;
+      font-size: 14px;
+      min-height: 56px;
+    }
+    .s1 { background: #FEF9C3; border-color: #FACC15; }
+    .s2 { background: #DCFCE7; border-color: #22C55E; }
+    .s3 { background: #FCE7F3; border-color: #EC4899; }
+    .s4 { background: #E0F2FE; border-color: #38BDF8; }
+
+    .helper {
+      font-size: 0.85em;
+      color: #374151;
+      margin: 4px 0 8px 0;
+    }
+    .helper strong {
+      display: block;
+      margin-bottom: 1px;
+    }
+
+    .fb {
+      background: #f8fafc;
+      padding: 6px;
+      margin-top: 4px;
+      border-radius: 6px;
+      border: 1px solid #e5e7eb;
+      font-size: 0.85em;
+    }
+    .btns {
+      margin-top: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    button {
+      padding: 6px 12px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.9em;
+      font-family: inherit;
+    }
+    button.check { background: #2563eb; color: #ffffff; }
+    button.read  { background: #7c3aed; color: #ffffff; }
+    button.copy  { background: #22c55e; color: #ffffff; }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <!-- Narrative structure header -->
+    <div class="coaster-wrapper">
+      <div class="coaster-title">Narrative Writing Structure</div>
+      <svg
+        class="coaster-svg"
+        viewBox="0 0 1000 260"
+        xmlns="http://www.w3.org/2000/svg"
+        xmlns:xlink="http://www.w3.org/1999/xlink"
+      >
+        <!-- Base grey track -->
+        <path id="storyPath"
+          d="M80 200 H360 L520 60 L680 200 H920"
+          fill="none"
+          stroke="#9ca3af"
+          stroke-width="6"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+        <!-- Coloured segments -->
+        <path d="M80 200 H360" fill="none" stroke="#facc15" stroke-width="6" stroke-linecap="round" />
+        <path d="M360 200 L440 130" fill="none" stroke="#f97316" stroke-width="6" stroke-linecap="round" />
+        <path d="M440 130 L520 60" fill="none" stroke="#b91c1c" stroke-width="6" stroke-linecap="round" />
+        <path d="M520 60 L600 130" fill="none" stroke="#b91c1c" stroke-width="6" stroke-linecap="round" />
+        <path d="M600 130 L680 200" fill="none" stroke="#22c55e" stroke-width="6" stroke-linecap="round" />
+        <path d="M680 200 H920" fill="none" stroke="#3b82f6" stroke-width="6" stroke-linecap="round" />
+
+        <!-- Animated "Character" marker -->
+        <g id="charMarker">
+          <circle cx="0" cy="0" r="16" fill="#a855f7" stroke="none" stroke-width="0" />
+          <text x="0" y="4" text-anchor="middle" font-size="9" fill="#000000" font-weight="bold">
+            Character
+          </text>
+          <animateMotion
+            dur="9s"
+            repeatCount="indefinite"
+            rotate="auto"
+            keySplines="0.42 0 0.58 1"
+            keyTimes="0;1"
+          >
+            <mpath xlink:href="#storyPath" />
+          </animateMotion>
+        </g>
+
+        <!-- Labels -->
+        <text x="120" y="225" font-size="14" fill="#111827">Introduction:</text>
+        <text x="245" y="225" font-size="14" fill="#111827">Character–Settings</text>
+
+        <text x="300" y="150" font-size="14" fill="#111827">Raising actions:</text>
+        <text x="300" y="168" font-size="14" fill="#111827">Say the conflict</text>
+
+        <text x="480" y="35" font-size="14" fill="#111827">Climax:</text>
+        <text x="480" y="53" font-size="14" fill="#111827">The most exciting part</text>
+
+        <text x="640" y="130" font-size="14" fill="#111827">Falling action:</text>
+        <text x="640" y="148" font-size="14" fill="#111827">Solving the problem</text>
+
+        <text x="720" y="225" font-size="14" fill="#111827">Resolution:</text>
+        <text x="720" y="243" font-size="14" fill="#111827">Ending</text>
+      </svg>
+    </div>
+
+    <div id="root"></div>
+  </div>
+
+  <script type="text/babel">
+    // ---------- localStorage helpers (autosave) ----------
+    function loadItem(key) {
+      try {
+        if (typeof window === "undefined" || !window.localStorage) return null;
+        return window.localStorage.getItem(key);
+      } catch (e) {
+        return null;
+      }
+    }
+
+    function saveItem(key, value) {
+      try {
+        if (typeof window === "undefined" || !window.localStorage) return;
+        window.localStorage.setItem(key, value);
+      } catch (e) {
+        // ignore storage errors
+      }
+    }
+
+    // ---------- SPELLING SUPPORT (dictionary + Levenshtein) ----------
+
+    const DICTIONARY_WORDS = [
+      // High-frequency function words
+      "a","about","above","after","again","all","almost","along","also","always","am","an","and","another","any",
+      "are","around","as","at","back","because","been","before","being","below","between","both","but","by","can",
+      "could","did","do","does","doing","down","during","each","else","even","ever","every","few","for","from","had",
+      "has","have","having","he","her","here","hers","herself","him","himself","his","how","i","if","in","into","is",
+      "it","its","itself","just","like","made","make","many","may","me","might","more","most","much","must","my",
+      "myself","no","not","now","of","off","on","once","one","only","or","other","our","ours","ourselves","out","over",
+      "own","said","same","she","should","so","some","such","than","that","the","their","theirs","them","themselves",
+      "then","there","these","they","this","those","through","to","too","under","up","very","was","we","were","what",
+      "when","where","which","while","who","whom","why","will","with","within","without","would","you","your","yours",
+      "yourself","yourselves",
+
+      // Common narrative nouns & verbs & adjectives
+      "boy","girl","child","teacher","student","class","school","hallway","corridor","classroom","playground","field",
+      "oval","park","forest","village","city","street","road","bridge","river","lake","ocean","sea","space","planet",
+      "moon","star","ship","spaceship","pod","robot","door","window","floor","ceiling","wall","desk","chair","light",
+      "shadow","noise","sound","voice","footsteps","wind","rain","storm","cloud","clouds","thunder","lightning",
+      "danger","problem","mystery","secret","clue","footprint","footprints","note","message","alarm","engine","button",
+      "panel","screen","smoke","fog","dust","fire","flame","flames","heart","eyes","hands","face","head","feet",
+
+      "run","ran","walk","walked","creep","crept","step","stepped","turn","turned","look","looked","glance","glanced",
+      "whisper","whispered","shout","shouted","exclaim","exclaimed","hurry","hurried","dash","dashed","stomp","stomped",
+      "glimpse","glimpsed","witness","witnessed","see","saw","seen","hear","heard","smell","smelt","smelled","taste",
+      "tasted","feel","felt","touch","touched","grab","grabbed","pull","pulled","push","pushed","slam","slammed",
+      "shake","shook","rattle","rattled","lurch","lurched","blink","blinked","flicker","flickered","drift","drifted",
+      "float","floated","fall","fell","fallen","rise","rose","risen","jump","jumped","leap","leapt","open","opened",
+      "close","closed","climb","climbed","hide","hid","hidden","search","searched","follow","followed","listen",
+      "listened","wait","waited","watch","watched","think","thought","wonder","wondered","hope","hoped","fear","feared",
+      "know","knew","realise","realised","realize","realized","breathe","breathed","speak","spoke","said",
+
+      "big","small","tiny","huge","massive","narrow","wide","dark","darker","darkest","bright","brighter","brightest",
+      "loud","louder","loudest","quiet","quieter","quietest","silent","cold","colder","coldest","hot","hotter","hottest",
+      "warm","warmer","warmest","strange","weird","odd","normal","usual","unusual","mysterious","eerie","creepy",
+      "frantic","gloomy","thunderous","dazzling","calm","peaceful","noisy","crowded","empty","nervous","scared",
+      "afraid","terrified","worried","anxious","curious","determined","cautious","brave","shy","sneaky","bossy",
+      "forgetful","hilarious","angry","furious","relieved","hopeful","excited","tired","exhausted","proud","thankful",
+
+      // Aussie / school spelling variants likely to appear
+      "colour","favorite","favourite","centre","center","neighbour","neighbor","maths","numeracy","library","office",
+      "principal","teacher","assistant","perth","australia","australian",
+
+      // Some narrative connectors
+      "suddenly","slowly","carefully","quietly","quickly","softly","sharply","gently","finally","afterward","afterwards",
+      "earlier","later","before","instead","meanwhile","inside","outside","nearby","everywhere","somewhere","nowhere",
+      "today","tonight","yesterday","tomorrow","morning","afternoon","evening","midnight"
+    ];
+
+    const DICTIONARY = new Set(DICTIONARY_WORDS);
+
+    function normaliseWord(raw) {
+      if (!raw) return "";
+      const cleaned = raw
+        .replace(/^[^a-zA-Z']+/, "")
+        .replace(/[^a-zA-Z']+$/, "")
+        .toLowerCase();
+      return cleaned;
+    }
+
+    function isLikelyWord(token) {
+      if (!token) return false;
+      if (token.length < 2) return false;
+      if (/^\d+$/.test(token)) return false;
+      return true;
+    }
+
+    // Simple Levenshtein distance
+    function levenshtein(a, b) {
+      const m = a.length;
+      const n = b.length;
+      if (m === 0) return n;
+      if (n === 0) return m;
+      const dp = Array.from({ length: m + 1 }, () => new Array(n + 1).fill(0));
+      for (let i = 0; i <= m; i++) dp[i][0] = i;
+      for (let j = 0; j <= n; j++) dp[0][j] = j;
+      for (let i = 1; i <= m; i++) {
+        for (let j = 1; j <= n; j++) {
+          const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+          dp[i][j] = Math.min(
+            dp[i - 1][j] + 1,
+            dp[i][j - 1] + 1,
+            dp[i - 1][j - 1] + cost
+          );
+        }
+      }
+      return dp[m][n];
+    }
+
+    function suggestSpelling(word) {
+      const maxSuggestions = 3;
+      const maxDistance = 2;
+      const w = word.toLowerCase();
+      const candidates = [];
+      DICTIONARY_WORDS.forEach(dictWord => {
+        if (Math.abs(dictWord.length - w.length) > 2) return;
+        const d = levenshtein(w, dictWord);
+        if (d <= maxDistance) {
+          candidates.push({ word: dictWord, dist: d });
+        }
+      });
+      candidates.sort((a, b) => a.dist - b.dist || a.word.localeCompare(b.word));
+      return candidates.slice(0, maxSuggestions).map(c => c.word);
+    }
+
+    // ---------- BASE FEEDBACK (capital / punctuation / pattern + spelling) ----------
+
+    function grammarChecks(sentence, idx) {
+      const feedback = [];
+      const trimmed = sentence.trim();
+
+      if (!trimmed) {
+        feedback.push("⚠️ Sentence missing.");
+        return feedback;
+      }
+
+      if (trimmed[0] !== trimmed[0].toUpperCase()) {
+        feedback.push("⚠️ Sentence should start with a capital letter.");
+      } else {
+        feedback.push("✅ Starts with a capital letter.");
+      }
+
+      if (!/[.?!]$/.test(trimmed)) {
+        feedback.push("⚠️ Sentence should end with a full stop, question mark, or exclamation mark.");
+      } else {
+        feedback.push("✅ Ends with correct punctuation.");
+      }
+
+      if (trimmed.split(" ").length < 6) {
+        feedback.push("⚠️ Try to expand your sentence with more detail (at least 6–8 words).");
+      }
+
+      if (idx === 1 && !/\b(saw|heard|smelt|smelled|felt|tasted|could see|could hear)\b/i.test(trimmed)) {
+        feedback.push("💡 Sentence 2 is often a sensory detail. Can you add what the character saw, heard, smelt, felt or tasted?");
+      }
+      if (idx === 2 && !/\b(ran|walked|crept|stepped|turned|looked|drifted|flickered|moved|shuffled|glanced|lurched|slammed|rattled)\b/i.test(trimmed)) {
+        feedback.push("💡 Sentence 3 is often an action or background movement. Try including a strong verb.");
+      }
+      if (idx === 3 && !/\b(I thought|I wondered|I felt|I hoped|I feared|I knew|I realised|I realized|\"|\”)/i.test(trimmed)) {
+        feedback.push("💡 Sentence 4 can show thoughts, feelings or dialogue. Can you show what the character says or thinks?");
+      }
+
+      // SPELLING CHECK
+      const tokens = trimmed.split(/\s+/);
+      const seenMisses = new Set();
+      tokens.forEach((tok, tIndex) => {
+        const core = normaliseWord(tok);
+        if (!isLikelyWord(core)) return;
+
+        const original = tok.replace(/^[^A-Za-z']+/, "");
+        if (/^[A-Z]/.test(original) && tIndex > 0) return;
+
+        if (!DICTIONARY.has(core)) {
+          if (seenMisses.has(core)) return;
+          seenMisses.add(core);
+          const suggestions = suggestSpelling(core);
+          if (suggestions.length > 0) {
+            feedback.push(`⚠️ "${core}" may be misspelled. Did you mean: ${suggestions.join(", ")}?`);
+          } else {
+            feedback.push(`⚠️ "${core}" may be misspelled. Check this word carefully.`);
+          }
+        }
+      });
+
+      return feedback;
+    }
+
+    const IntroHelper = () => {
+      // Intro paragraph (autosave)
+      const [introSentences, setIntroSentences] = React.useState(() => [
+        loadItem("intro_s0") || "",
+        loadItem("intro_s1") || "",
+        loadItem("intro_s2") || "",
+        loadItem("intro_s3") || ""
+      ]);
+      const [introFeedback, setIntroFeedback] = React.useState([[], [], [], []]);
+
+      // Rising Action paragraph
+      const [raSentences, setRaSentences] = React.useState(() => [
+        loadItem("ra_s0") || "",
+        loadItem("ra_s1") || "",
+        loadItem("ra_s2") || "",
+        loadItem("ra_s3") || ""
+      ]);
+      const [raFeedback, setRaFeedback] = React.useState([[], [], [], []]);
+
+      // Climax paragraph
+      const [climaxSentences, setClimaxSentences] = React.useState(() => [
+        loadItem("climax_s0") || "",
+        loadItem("climax_s1") || "",
+        loadItem("climax_s2") || "",
+        loadItem("climax_s3") || ""
+      ]);
+      const [climaxFeedback, setClimaxFeedback] = React.useState([[], [], [], []]);
+
+      // Falling Action paragraph
+      const [fallSentences, setFallSentences] = React.useState(() => [
+        loadItem("fall_s0") || "",
+        loadItem("fall_s1") || "",
+        loadItem("fall_s2") || "",
+        loadItem("fall_s3") || ""
+      ]);
+      const [fallFeedback, setFallFeedback] = React.useState([[], [], [], []]);
+
+      // Resolution paragraph
+      const [resSentences, setResSentences] = React.useState(() => [
+        loadItem("res_s0") || "",
+        loadItem("res_s1") || "",
+        loadItem("res_s2") || "",
+        loadItem("res_s3") || ""
+      ]);
+      const [resFeedback, setResFeedback] = React.useState([[], [], [], []]);
+
+      const updateIntroSentence = (index, value) => {
+        setIntroSentences(prev => {
+          const copy = [...prev];
+          copy[index] = value;
+          return copy;
+        });
+        saveItem("intro_s" + index, value);
+      };
+
+      const updateRaSentence = (index, value) => {
+        setRaSentences(prev => {
+          const copy = [...prev];
+          copy[index] = value;
+          return copy;
+        });
+        saveItem("ra_s" + index, value);
+      };
+
+      const updateClimaxSentence = (index, value) => {
+        setClimaxSentences(prev => {
+          const copy = [...prev];
+          copy[index] = value;
+          return copy;
+        });
+        saveItem("climax_s" + index, value);
+      };
+
+      const updateFallSentence = (index, value) => {
+        setFallSentences(prev => {
+          const copy = [...prev];
+          copy[index] = value;
+          return copy;
+        });
+        saveItem("fall_s" + index, value);
+      };
+
+      const updateResSentence = (index, value) => {
+        setResSentences(prev => {
+          const copy = [...prev];
+          copy[index] = value;
+          return copy;
+        });
+        saveItem("res_s" + index, value);
+      };
+
+      const checkIntro = () => {
+        setIntroFeedback(introSentences.map((s, idx) => grammarChecks(s, idx)));
+      };
+
+      const checkRa = () => {
+        setRaFeedback(raSentences.map((s, idx) => grammarChecks(s, idx)));
+      };
+
+      const checkClimax = () => {
+        setClimaxFeedback(climaxSentences.map((s, idx) => grammarChecks(s, idx)));
+      };
+
+      const checkFall = () => {
+        setFallFeedback(fallSentences.map((s, idx) => grammarChecks(s, idx)));
+      };
+
+      const checkRes = () => {
+        setResFeedback(resSentences.map((s, idx) => grammarChecks(s, idx)));
+      };
+
+      const makeReadAloud = sentences => {
+        const text = sentences.join(" ").trim();
+        if (!text) {
+          alert("Please write your sentences first so there is something to read aloud.");
+          return;
+        }
+        if (!window.speechSynthesis) {
+          alert("Sorry, your browser does not support reading aloud.");
+          return;
+        }
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.rate = 0.95;
+        window.speechSynthesis.speak(utterance);
+      };
+
+      const readAloudIntro = () => makeReadAloud(introSentences);
+      const readAloudRa = () => makeReadAloud(raSentences);
+      const readAloudClimax = () => makeReadAloud(climaxSentences);
+      const readAloudFall = () => makeReadAloud(fallSentences);
+      const readAloudRes = () => makeReadAloud(resSentences);
+
+      const makeCopy = async sentences => {
+        const text = sentences.join(" ").trim();
+        if (!text) {
+          alert("There is no text to copy yet.");
+          return;
+        }
+        try {
+          await navigator.clipboard.writeText(text);
+          alert("Paragraph copied to clipboard!");
+        } catch (e) {
+          alert("Could not copy to clipboard, but here is your paragraph:\n\n" + text);
+        }
+      };
+
+      const copyIntro = () => makeCopy(introSentences);
+      const copyRa = () => makeCopy(raSentences);
+      const copyClimax = () => makeCopy(climaxSentences);
+      const copyFall = () => makeCopy(fallSentences);
+      const copyRes = () => makeCopy(resSentences);
+
+      // Planner state (autosave)
+      const [planner, setPlanner] = React.useState(() => ({
+        introWho: loadItem("planner_introWho") || "",
+        introWhere: loadItem("planner_introWhere") || "",
+        introWhen: loadItem("planner_introWhen") || "",
+        risingProblem: loadItem("planner_risingProblem") || "",
+        risingClues: loadItem("planner_risingClues") || "",
+        risingReact: loadItem("planner_risingReact") || "",
+        climaxMoment: loadItem("planner_climaxMoment") || "",
+        climaxAction: loadItem("planner_climaxAction") || "",
+        climaxFeel: loadItem("planner_climaxFeel") || "",
+        fallingCalm: loadItem("planner_fallingCalm") || "",
+        fallingChange: loadItem("planner_fallingChange") || "",
+        endLearn: loadItem("planner_endLearn") || "",
+        endFeel: loadItem("planner_endFeel") || ""
+      }));
+
+      const handlePlannerChange = (field, value) => {
+        setPlanner(prev => ({ ...prev, [field]: value }));
+        saveItem("planner_" + field, value);
+      };
+
+      // Shared word bank text
+      const verbBank = "pondered, contemplated, whispered, shouted, exclaimed, hurried, dashed, stomped, glimpsed, witnessed";
+      const adjBank = "anxious, curious, determined, cautious, frantic, gloomy, dazzling, eerie, mysterious, thunderous";
+
+      return (
+        <div>
+          {/* NARRATIVE ORGANISER */}
+          <div className="planner">
+            <h3>Narrative Organiser</h3>
+            <p className="info">
+              Use these boxes to plan your narrative. Answer each question using dot points or short sentences.
+            </p>
+            <div className="plot-line">
+              {/* Box 1 – Introduction */}
+              <div className="plot-step">
+                <div className="plot-step-title">Box 1 – Introduction</div>
+
+                <div className="plot-subquestion">
+                  <div className="plot-question-text">
+                    Who are the main character/s and what is their personality?
+                    For example: forgetful, grumpy, hilarious, brave, shy, sneaky, cautious, bossy, nervous, daydreamy.
+                  </div>
+                  <textarea
+                    value={planner.introWho}
+                    onChange={e => handlePlannerChange("introWho", e.target.value)}
+                  />
+                </div>
+
+                <div className="plot-subquestion">
+                  <div className="plot-question-text">
+                    Where does the story begin?
+                  </div>
+                  <textarea
+                    value={planner.introWhere}
+                    onChange={e => handlePlannerChange("introWhere", e.target.value)}
+                  />
+                </div>
+
+                <div className="plot-subquestion">
+                  <div className="plot-question-text">
+                    When does the story happen?
+                  </div>
+                  <textarea
+                    value={planner.introWhen}
+                    onChange={e => handlePlannerChange("introWhen", e.target.value)}
+                  />
+                </div>
+              </div>
+
+              {/* Box 2 – Conflict & Rising Action */}
+              <div className="plot-step">
+                <div className="plot-step-title">Box 2 – Conflict & Rising Action</div>
+
+                <div className="plot-subquestion">
+                  <div className="plot-question-text">
+                    What problem or mystery appears?
+                  </div>
+                  <textarea
+                    value={planner.risingProblem}
+                    onChange={e => handlePlannerChange("risingProblem", e.target.value)}
+                  />
+                </div>
+
+                <div className="plot-subquestion">
+                  <div className="plot-question-text">
+                    What small changes or clues build tension?
+                  </div>
+                  <textarea
+                    value={planner.risingClues}
+                    onChange={e => handlePlannerChange("risingClues", e.target.value)}
+                  />
+                </div>
+
+                <div className="plot-subquestion">
+                  <div className="plot-question-text">
+                    How does the character react?
+                  </div>
+                  <textarea
+                    value={planner.risingReact}
+                    onChange={e => handlePlannerChange("risingReact", e.target.value)}
+                  />
+                </div>
+              </div>
+
+              {/* Box 3 – Climax */}
+              <div className="plot-step">
+                <div className="plot-step-title">Box 3 – Climax</div>
+
+                <div className="plot-subquestion">
+                  <div className="plot-question-text">
+                    What is the most exciting or intense moment?
+                  </div>
+                  <textarea
+                    value={planner.climaxMoment}
+                    onChange={e => handlePlannerChange("climaxMoment", e.target.value)}
+                  />
+                </div>
+
+                <div className="plot-subquestion">
+                  <div className="plot-question-text">
+                    What important action happens?
+                  </div>
+                  <textarea
+                    value={planner.climaxAction}
+                    onChange={e => handlePlannerChange("climaxAction", e.target.value)}
+                  />
+                </div>
+
+                <div className="plot-subquestion">
+                  <div className="plot-question-text">
+                    What does the character think or feel?
+                  </div>
+                  <textarea
+                    value={planner.climaxFeel}
+                    onChange={e => handlePlannerChange("climaxFeel", e.target.value)}
+                  />
+                </div>
+              </div>
+
+              {/* Box 4 – Falling Action */}
+              <div className="plot-step">
+                <div className="plot-step-title">Box 4 – Falling Action / Problem Solved</div>
+
+                <div className="plot-subquestion">
+                  <div className="plot-question-text">
+                    What starts to calm down or change?
+                  </div>
+                  <textarea
+                    value={planner.fallingCalm}
+                    onChange={e => handlePlannerChange("fallingCalm", e.target.value)}
+                  />
+                </div>
+
+                <div className="plot-subquestion">
+                  <div className="plot-question-text">
+                    How is the problem beginning to be fixed?
+                  </div>
+                  <textarea
+                    value={planner.fallingChange}
+                    onChange={e => handlePlannerChange("fallingChange", e.target.value)}
+                  />
+                </div>
+              </div>
+
+              {/* Box 5 – Resolution */}
+              <div className="plot-step">
+                <div className="plot-step-title">Box 5 – Resolution / Ending</div>
+
+                <div className="plot-subquestion">
+                  <div className="plot-question-text">
+                    What does the character learn or realise?
+                  </div>
+                  <textarea
+                    value={planner.endLearn}
+                    onChange={e => handlePlannerChange("endLearn", e.target.value)}
+                  />
+                </div>
+
+                <div className="plot-subquestion">
+                  <div className="plot-question-text">
+                    How does the character feel at the end?
+                  </div>
+                  <textarea
+                    value={planner.endFeel}
+                    onChange={e => handlePlannerChange("endFeel", e.target.value)}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* INTRODUCTION PARAGRAPH HELPER */}
+          <div className="card card-intro">
+            <h3>Introduction Paragraph – Orientation, Setting, Character</h3>
+            <p className="subtitle">
+              Use four sentences to introduce your character and the setting, and to give a hint that something is not quite right.
+            </p>
+            <p className="subtitle">
+              <strong>Word bank – upgraded verbs:</strong> {verbBank}<br />
+              <strong>Word bank – upgraded adjectives:</strong> {adjBank}
+            </p>
+
+            <div className="intro-layout">
+              {/* Column 1 – description */}
+              <div>
+                <h4>Sentence Purposes</h4>
+                <div className="sentence-strip">
+                  <div className="sentence-tile tile-s1">
+                    Sentence 1: Hook the reader (dialogue or action) and show the main character.
+                  </div>
+                  <div className="sentence-tile tile-s2">
+                    Sentence 2: Add a sensory detail (what can be seen, heard, smelt, felt or tasted).
+                  </div>
+                  <div className="sentence-tile tile-s3">
+                    Sentence 3: Show what is happening or changing in the setting – include a simile.
+                  </div>
+                  <div className="sentence-tile tile-s4">
+                    Sentence 4: Show the character’s feelings or thoughts about this moment using dialogue.
+                  </div>
+                </div>
+              </div>
+
+              {/* Column 2 – HAGPLL intro */}
+              <div>
+                <h4>How A Good Paragraph Looks Like (HAGPLL)</h4>
+                <div className="hagpll-box">
+                  <div className="hagpll-text">
+                    <span className="hagpll-s1">
+                      “What is this red light flashing on my panel?” Zarnok pondered with a worried look on his face.
+                    </span>{" "}
+                    <span className="hagpll-s2">
+                      Zarnok sensed that something was wrong with his spaceship, and he knew there was a blue planet nearby where he might need to make an emergency landing.
+                    </span>{" "}
+                    <span className="hagpll-s3">
+                      Zarnok’s furry skin started to change to a greyish colour and his three glowing eyes blinked like lights flickering in the dark.
+                    </span>{" "}
+                    <span className="hagpll-s4">
+                      “Stay calm, Zarnok… this is just a tiny problem,” he whispered, even though the smell of smoke was getting stronger.
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Column 3 – Your turn intro */}
+              <div className="intro-right">
+                <h4>Your Turn – Write Your Introduction</h4>
+
+                <label>Sentence 1 – Hook + Character</label>
+                <div className="helper">
+                  <strong>Ideas:</strong> Use dialogue or a short action. Name your character and hint at where they are.
+                  <strong>Sentence starters:</strong> “What is that…?”, “I can’t believe…”, “Why is…?”, “Wait a second…”
+                  <strong>Upgraded verbs:</strong> {verbBank}
+                </div>
+                <textarea
+                  className="s1"
+                  spellCheck="true"
+                  value={introSentences[0]}
+                  onChange={e => updateIntroSentence(0, e.target.value)}
+                />
+                <div className="fb">
+                  {introFeedback[0].length === 0
+                    ? <em>No feedback yet.</em>
+                    : introFeedback[0].map((f, i) => <div key={i}>{f}</div>)}
+                </div>
+
+                <label>Sentence 2 – Sensory Detail</label>
+                <div className="helper">
+                  <strong>Ideas:</strong> Describe what the character can see, hear, smell or feel.
+                  <strong>Adjectives:</strong> {adjBank}
+                  <strong>Figurative language:</strong> You can still use a simile here if it fits naturally.
+                </div>
+                <textarea
+                  className="s2"
+                  spellCheck="true"
+                  value={introSentences[1]}
+                  onChange={e => updateIntroSentence(1, e.target.value)}
+                />
+                <div className="fb">
+                  {introFeedback[1].length === 0
+                    ? <em>No feedback yet.</em>
+                    : introFeedback[1].map((f, i) => <div key={i}>{f}</div>)}
+                </div>
+
+                <label>Sentence 3 – Background Action / Setting Change (Simile)</label>
+                <div className="helper">
+                  <strong>Ideas:</strong> Show movement or change in the scene (lights, people, sounds, objects).
+                  <strong>Upgraded verbs:</strong> {verbBank}
+                  <strong>Figurative language (simile):</strong> Compare something using “like…” or “as…as…”, for example
+                  “The corridor was as quiet as a sleeping cat” or “Lights flickered like tiny stars.”
+                </div>
+                <textarea
+                  className="s3"
+                  spellCheck="true"
+                  value={introSentences[2]}
+                  onChange={e => updateIntroSentence(2, e.target.value)}
+                />
+                <div className="fb">
+                  {introFeedback[2].length === 0
+                    ? <em>No feedback yet.</em>
+                    : introFeedback[2].map((f, i) => <div key={i}>{f}</div>)}
+                </div>
+
+                <label>Sentence 4 – Thought / Feeling with Dialogue</label>
+                <div className="helper">
+                  <strong>Ideas:</strong> Show what the character is thinking or feeling and include dialogue with speech marks.
+                  <strong>Sentence starters:</strong> “I knew that…”, “I tried not to panic but…”, “I whispered, ‘…’”.
+                  <strong>Remember:</strong> Use quotation marks (“ ”) around what the character says.
+                </div>
+                <textarea
+                  className="s4"
+                  spellCheck="true"
+                  value={introSentences[3]}
+                  onChange={e => updateIntroSentence(3, e.target.value)}
+                />
+                <div className="fb">
+                  {introFeedback[3].length === 0
+                    ? <em>No feedback yet.</em>
+                    : introFeedback[3].map((f, i) => <div key={i}>{f}</div>)}
+                </div>
+
+                <div className="btns">
+                  <button className="check" type="button" onClick={checkIntro}>
+                    Check spelling, punctuation, and capitalisation
+                  </button>
+                  <button className="read" type="button" onClick={readAloudIntro}>
+                    Read aloud
+                  </button>
+                  <button className="copy" type="button" onClick={copyIntro}>
+                    Copy paragraph
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* RAISING ACTIONS PARAGRAPH HELPER */}
+          <div className="card card-raising">
+            <h3>Raising Actions – Saying the Conflict and Building Tension</h3>
+            <p className="subtitle">
+              Use four sentences to show the problem, how it gets worse, and how your character reacts.
+            </p>
+            <p className="subtitle">
+              <strong>Word bank – upgraded verbs:</strong> {verbBank}<br />
+              <strong>Word bank – upgraded adjectives:</strong> {adjBank}
+            </p>
+
+            <div className="intro-layout">
+              {/* Column 1 – sentence descriptions */}
+              <div>
+                <h4>Sentence Purposes</h4>
+                <div className="sentence-strip">
+                  <div className="sentence-tile tile-s1">
+                    Sentence 1: Clearly show the problem or conflict appearing.
+                  </div>
+                  <div className="sentence-tile tile-s2">
+                    Sentence 2: Add a sensory detail that makes the problem feel real (you can use figurative language here).
+                  </div>
+                  <div className="sentence-tile tile-s3">
+                    Sentence 3: Show an action or event that makes the tension rise.
+                  </div>
+                  <div className="sentence-tile tile-s4">
+                    Sentence 4: Show the character’s thoughts or feelings about the growing problem.
+                  </div>
+                </div>
+              </div>
+
+              {/* Column 2 – HAGPLL Raising Action */}
+              <div>
+                <h4>How A Good Paragraph Looks Like (HAGPLL)</h4>
+                <div className="hagpll-box">
+                  <div className="hagpll-text">
+                    <span className="hagpll-s1">
+                      Without warning, alarms screeched through Zarnok’s pod and a crack opened in the metal wall beside him.
+                    </span>{" "}
+                    <span className="hagpll-s2">
+                      Hot smoke hissed out of the crack and curled around his control panel like a dark, choking fog.
+                    </span>{" "}
+                    <span className="hagpll-s3">
+                      The spaceship lurched sideways, loose wires swung above his head, and glowing buttons flashed faster and faster.
+                    </span>{" "}
+                    <span className="hagpll-s4">
+                      “If I don’t fix this now, I’ll never reach that planet,” Zarnok exclaimed, his three hearts pounding like drums inside his chest.
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Column 3 – Your turn Raising Action */}
+              <div className="intro-right">
+                <h4>Your Turn – Write Your Raising Actions Paragraph</h4>
+
+                <label>Sentence 1 – Show the Problem / Conflict</label>
+                <div className="helper">
+                  <strong>Ideas:</strong> Something goes wrong or changes. A problem appears.
+                  <strong>Sentence starters:</strong> Suddenly…, Without warning…, Out of nowhere…, In an instant…
+                  <strong>Upgraded verbs:</strong> {verbBank}
+                </div>
+                <textarea
+                  className="s1"
+                  spellCheck="true"
+                  value={raSentences[0]}
+                  onChange={e => updateRaSentence(0, e.target.value)}
+                />
+                <div className="fb">
+                  {raFeedback[0].length === 0
+                    ? <em>No feedback yet.</em>
+                    : raFeedback[0].map((f, i) => <div key={i}>{f}</div>)}
+                </div>
+
+                <label>Sentence 2 – Sensory Detail About the Problem (Figurative Language)</label>
+                <div className="helper">
+                  <strong>Ideas:</strong> Describe what the character can see, hear, smell, feel or taste as the problem happens.
+                  <strong>Adjectives:</strong> {adjBank}
+                  <strong>Figurative language:</strong> Try a simile or metaphor, for example “The noise was like thunder in my ears” or “Smoke wrapped around me like a blanket.”
+                </div>
+                <textarea
+                  className="s2"
+                  spellCheck="true"
+                  value={raSentences[1]}
+                  onChange={e => updateRaSentence(1, e.target.value)}
+                />
+                <div className="fb">
+                  {raFeedback[1].length === 0
+                    ? <em>No feedback yet.</em>
+                    : raFeedback[1].map((f, i) => <div key={i}>{f}</div>)}
+                </div>
+
+                <label>Sentence 3 – Action That Raises Tension</label>
+                <div className="helper">
+                  <strong>Ideas:</strong> Show what moves, breaks, appears, or changes next.
+                  <strong>Upgraded verbs:</strong> {verbBank}
+                  <strong>Techniques:</strong> Short, sharp phrases can make the scene feel faster.
+                </div>
+                <textarea
+                  className="s3"
+                  spellCheck="true"
+                  value={raSentences[2]}
+                  onChange={e => updateRaSentence(2, e.target.value)}
+                />
+                <div className="fb">
+                  {raFeedback[2].length === 0
+                    ? <em>No feedback yet.</em>
+                    : raFeedback[2].map((f, i) => <div key={i}>{f}</div>)}
+                </div>
+
+                <label>Sentence 4 – Character’s Thoughts or Feelings</label>
+                <div className="helper">
+                  <strong>Ideas:</strong> Show what the character is thinking or feeling about this problem now (you can use dialogue too).
+                  <strong>Sentence starters:</strong> “I knew that…”, “I tried not to panic but…”, “I shouted, ‘…’”.
+                  <strong>Emotion words:</strong> anxious, desperate, determined, shocked, furious, confused.
+                </div>
+                <textarea
+                  className="s4"
+                  spellCheck="true"
+                  value={raSentences[3]}
+                  onChange={e => updateRaSentence(3, e.target.value)}
+                />
+                <div className="fb">
+                  {raFeedback[3].length === 0
+                    ? <em>No feedback yet.</em>
+                    : raFeedback[3].map((f, i) => <div key={i}>{f}</div>)}
+                </div>
+
+                <div className="btns">
+                  <button className="check" type="button" onClick={checkRa}>
+                    Check spelling, punctuation, and capitalisation
+                  </button>
+                  <button className="read" type="button" onClick={readAloudRa}>
+                    Read aloud
+                  </button>
+                  <button className="copy" type="button" onClick={copyRa}>
+                    Copy paragraph
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* CLIMAX PARAGRAPH HELPER */}
+          <div className="card card-climax">
+            <h3>Climax – The Most Exciting Part</h3>
+            <p className="subtitle">
+              Use four sentences to zoom in on the most exciting moment, using powerful verbs and figurative language.
+            </p>
+            <p className="subtitle">
+              <strong>Word bank – upgraded verbs:</strong> {verbBank}<br />
+              <strong>Word bank – upgraded adjectives:</strong> {adjBank}
+            </p>
+
+            <div className="intro-layout">
+              {/* Column 1 – sentence descriptions */}
+              <div>
+                <h4>Sentence Purposes</h4>
+                <div className="sentence-strip">
+                  <div className="sentence-tile tile-s1">
+                    Sentence 1: Zoom in on the most intense moment of the problem.
+                  </div>
+                  <div className="sentence-tile tile-s2">
+                    Sentence 2: Use strong sensory detail and figurative language (metaphor or personification).
+                  </div>
+                  <div className="sentence-tile tile-s3">
+                    Sentence 3: Show the big action or decision that changes everything.
+                  </div>
+                  <div className="sentence-tile tile-s4">
+                    Sentence 4: Show the strongest thoughts or feelings of the character.
+                  </div>
+                </div>
+              </div>
+
+              {/* Column 2 – HAGPLL Climax */}
+              <div>
+                <h4>How A Good Paragraph Looks Like (HAGPLL)</h4>
+                <div className="hagpll-box">
+                  <div className="hagpll-text">
+                    <span className="hagpll-s1">
+                      As the main engine exploded in a shower of sparks, Zarnok’s pod swung dangerously close to the blue planet below.
+                    </span>{" "}
+                    <span className="hagpll-s2">
+                      The controls rattled in his hands and the whole spaceship roared like a wild beast that had finally broken free.
+                    </span>{" "}
+                    <span className="hagpll-s3">
+                      Gritting his teeth, Zarnok slammed his three-fingered hand onto the emergency landing button and yanked the steering lever hard to the left.
+                    </span>{" "}
+                    <span className="hagpll-s4">
+                      “This is it… if this doesn’t work, I’m space dust,” he thought, every part of him trembling with a mix of terror and determination.
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Column 3 – Your turn Climax */}
+              <div className="intro-right">
+                <h4>Your Turn – Write Your Climax Paragraph</h4>
+
+                <label>Sentence 1 – Focus on the Most Intense Moment</label>
+                <div className="helper">
+                  <strong>Ideas:</strong> Describe the exact second when the problem is at its worst.
+                  <strong>Sentence starters:</strong> At that moment…, In a split second…, As the noise grew…, Just as I thought it was over…
+                  <strong>Upgraded adjectives:</strong> {adjBank}
+                </div>
+                <textarea
+                  className="s1"
+                  spellCheck="true"
+                  value={climaxSentences[0]}
+                  onChange={e => updateClimaxSentence(0, e.target.value)}
+                />
+                <div className="fb">
+                  {climaxFeedback[0].length === 0
+                    ? <em>No feedback yet.</em>
+                    : climaxFeedback[0].map((f, i) => <div key={i}>{f}</div>)}
+                </div>
+
+                <label>Sentence 2 – Sensory Detail + Figurative Language</label>
+                <div className="helper">
+                  <strong>Ideas:</strong> Show what the character can see, hear, feel or smell.
+                  <strong>Figurative language:</strong> Use a metaphor or personification, e.g. “The wind clawed at my face”, “Fear wrapped around me like a heavy coat.”
+                  <strong>Upgraded verbs:</strong> {verbBank}
+                </div>
+                <textarea
+                  className="s2"
+                  spellCheck="true"
+                  value={climaxSentences[1]}
+                  onChange={e => updateClimaxSentence(1, e.target.value)}
+                />
+                <div className="fb">
+                  {climaxFeedback[1].length === 0
+                    ? <em>No feedback yet.</em>
+                    : climaxFeedback[1].map((f, i) => <div key={i}>{f}</div>)}
+                </div>
+
+                <label>Sentence 3 – Big Action or Decision</label>
+                <div className="helper">
+                  <strong>Ideas:</strong> Show what the character does to face the problem.
+                  <strong>Upgraded verbs:</strong> {verbBank}
+                  <strong>Tip:</strong> Keep the action clear so the reader knows exactly what happened.
+                </div>
+                <textarea
+                  className="s3"
+                  spellCheck="true"
+                  value={climaxSentences[2]}
+                  onChange={e => updateClimaxSentence(2, e.target.value)}
+                />
+                <div className="fb">
+                  {climaxFeedback[2].length === 0
+                    ? <em>No feedback yet.</em>
+                    : climaxFeedback[2].map((f, i) => <div key={i}>{f}</div>)}
+                </div>
+
+                <label>Sentence 4 – Strong Thoughts or Feelings</label>
+                <div className="helper">
+                  <strong>Ideas:</strong> Show what the character thinks or feels in this big moment. You can use dialogue.
+                  <strong>Sentence starters:</strong> “I knew this was…”, “I couldn’t stop thinking…”, “I shouted, ‘…’”.
+                  <strong>Emotion words:</strong> terrified, determined, shocked, furious, hopeful.
+                </div>
+                <textarea
+                  className="s4"
+                  spellCheck="true"
+                  value={climaxSentences[3]}
+                  onChange={e => updateClimaxSentence(3, e.target.value)}
+                />
+                <div className="fb">
+                  {climaxFeedback[3].length === 0
+                    ? <em>No feedback yet.</em>
+                    : climaxFeedback[3].map((f, i) => <div key={i}>{f}</div>)}
+                </div>
+
+                <div className="btns">
+                  <button className="check" type="button" onClick={checkClimax}>
+                    Check spelling, punctuation, and capitalisation
+                  </button>
+                  <button className="read" type="button" onClick={readAloudClimax}>
+                    Read aloud
+                  </button>
+                  <button className="copy" type="button" onClick={copyClimax}>
+                    Copy paragraph
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* FALLING ACTION PARAGRAPH HELPER */}
+          <div className="card card-falling">
+            <h3>Falling Action – Solving the Problem</h3>
+            <p className="subtitle">
+              Use four sentences to show how things start to calm down and how the problem is being solved.
+            </p>
+            <p className="subtitle">
+              <strong>Word bank – upgraded verbs:</strong> {verbBank}<br />
+              <strong>Word bank – upgraded adjectives:</strong> {adjBank}
+            </p>
+
+            <div className="intro-layout">
+              {/* Column 1 – sentence descriptions */}
+              <div>
+                <h4>Sentence Purposes</h4>
+                <div className="sentence-strip">
+                  <div className="sentence-tile tile-s1">
+                    Sentence 1: Show what changes straight after the climax.
+                  </div>
+                  <div className="sentence-tile tile-s2">
+                    Sentence 2: Show actions that help fix the problem.
+                  </div>
+                  <div className="sentence-tile tile-s3">
+                    Sentence 3: Use figurative language to show the world becoming calmer.
+                  </div>
+                  <div className="sentence-tile tile-s4">
+                    Sentence 4: Show how the character is starting to feel different.
+                  </div>
+                </div>
+              </div>
+
+              {/* Column 2 – HAGPLL Falling Action */}
+              <div>
+                <h4>How A Good Paragraph Looks Like (HAGPLL)</h4>
+                <div className="hagpll-box">
+                  <div className="hagpll-text">
+                    <span className="hagpll-s1">
+                      The pod steadied and the roar of the engines faded into a low, tired hum.
+                    </span>{" "}
+                    <span className="hagpll-s2">
+                      Zarnok quickly sealed the crack with a metal patch and tapped a row of glowing buttons to cool the overheating wires.
+                    </span>{" "}
+                    <span className="hagpll-s3">
+                      Outside the window, the fiery clouds slowly drifted apart like curtains being pulled back from a quiet stage.
+                    </span>{" "}
+                    <span className="hagpll-s4">
+                      For the first time in what felt like hours, Zarnok could breathe without his hearts racing, and a tiny spark of hope flickered inside him.
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Column 3 – Your turn Falling Action */}
+              <div className="intro-right">
+                <h4>Your Turn – Write Your Falling Action Paragraph</h4>
+
+                <label>Sentence 1 – Change After the Climax</label>
+                <div className="helper">
+                  <strong>Ideas:</strong> Show what is different now that the big moment has passed.
+                  <strong>Sentence starters:</strong> Slowly…, After that…, As the noise faded…, When the dust settled…
+                  <strong>Adjectives:</strong> {adjBank}
+                </div>
+                <textarea
+                  className="s1"
+                  spellCheck="true"
+                  value={fallSentences[0]}
+                  onChange={e => updateFallSentence(0, e.target.value)}
+                />
+                <div className="fb">
+                  {fallFeedback[0].length === 0
+                    ? <em>No feedback yet.</em>
+                    : fallFeedback[0].map((f, i) => <div key={i}>{f}</div>)}
+                </div>
+
+                <label>Sentence 2 – Actions That Help Fix the Problem</label>
+                <div className="helper">
+                  <strong>Ideas:</strong> Show what the character does to repair, clean up, or make things right.
+                  <strong>Upgraded verbs:</strong> {verbBank}
+                </div>
+                <textarea
+                  className="s2"
+                  spellCheck="true"
+                  value={fallSentences[1]}
+                  onChange={e => updateFallSentence(1, e.target.value)}
+                />
+                <div className="fb">
+                  {fallFeedback[1].length === 0
+                    ? <em>No feedback yet.</em>
+                    : fallFeedback[1].map((f, i) => <div key={i}>{f}</div>)}
+                </div>
+
+                <label>Sentence 3 – Figurative Language to Show Calm</label>
+                <div className="helper">
+                  <strong>Ideas:</strong> Use simile or personification to show the world calming down.
+                  <strong>Examples:</strong> “The corridor felt as peaceful as a sleeping cat”, “The wind whispered softly through the trees.”
+                </div>
+                <textarea
+                  className="s3"
+                  spellCheck="true"
+                  value={fallSentences[2]}
+                  onChange={e => updateFallSentence(2, e.target.value)}
+                />
+                <div className="fb">
+                  {fallFeedback[2].length === 0
+                    ? <em>No feedback yet.</em>
+                    : fallFeedback[2].map((f, i) => <div key={i}>{f}</div>)}
+                </div>
+
+                <label>Sentence 4 – Character’s New Feelings</label>
+                <div className="helper">
+                  <strong>Ideas:</strong> Show how the character feels now that things are improving.
+                  <strong>Sentence starters:</strong> I finally felt…, A wave of relief…, I couldn’t stop smiling because…
+                  <strong>Emotion words:</strong> relieved, calm, proud, thankful, exhausted.
+                </div>
+                <textarea
+                  className="s4"
+                  spellCheck="true"
+                  value={fallSentences[3]}
+                  onChange={e => updateFallSentence(3, e.target.value)}
+                />
+                <div className="fb">
+                  {fallFeedback[3].length === 0
+                    ? <em>No feedback yet.</em>
+                    : fallFeedback[3].map((f, i) => <div key={i}>{f}</div>)}
+                </div>
+
+                <div className="btns">
+                  <button className="check" type="button" onClick={checkFall}>
+                    Check spelling, punctuation, and capitalisation
+                  </button>
+                  <button className="read" type="button" onClick={readAloudFall}>
+                    Read aloud
+                  </button>
+                  <button className="copy" type="button" onClick={copyFall}>
+                    Copy paragraph
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* RESOLUTION PARAGRAPH HELPER */}
+          <div className="card card-resolution">
+            <h3>Resolution – Ending and Lesson Learned</h3>
+            <p className="subtitle">
+              Use four sentences to show the final result, the lesson, and how your character feels at the end.
+            </p>
+            <p className="subtitle">
+              <strong>Word bank – upgraded verbs:</strong> {verbBank}<br />
+              <strong>Word bank – upgraded adjectives:</strong> {adjBank}
+            </p>
+
+            <div className="intro-layout">
+              {/* Column 1 – sentence descriptions */}
+              <div>
+                <h4>Sentence Purposes</h4>
+                <div className="sentence-strip">
+                  <div className="sentence-tile tile-s1">
+                    Sentence 1: Show how life looks now after the problem is solved.
+                  </div>
+                  <div className="sentence-tile tile-s2">
+                    Sentence 2: Explain what the character has learnt or realised (you can use figurative language).
+                  </div>
+                  <div className="sentence-tile tile-s3">
+                    Sentence 3: Show how the character feels about the whole experience.
+                  </div>
+                  <div className="sentence-tile tile-s4">
+                    Sentence 4: Give a closing sentence that links back or leaves the reader thinking.
+                  </div>
+                </div>
+              </div>
+
+              {/* Column 2 – HAGPLL Resolution */}
+              <div>
+                <h4>How A Good Paragraph Looks Like (HAGPLL)</h4>
+                <div className="hagpll-box">
+                  <div className="hagpll-text">
+                    <span className="hagpll-s1">
+                      By the time Zarnok’s pod finally landed with a gentle thump on the soft blue planet, the warning lights had faded to a calm, steady glow.
+                    </span>{" "}
+                    <span className="hagpll-s2">
+                      He realised that facing danger was like stepping into a dark tunnel – frightening at first, but full of new paths once you kept walking.
+                    </span>{" "}
+                    <span className="hagpll-s3">
+                      A warm, curious feeling spread through him as he looked at the strange new world waiting outside his pod.
+                    </span>{" "}
+                    <span className="hagpll-s4">
+                      With one deep breath, Zarnok opened the door and stepped forward, ready for whatever adventure came next.
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Column 3 – Your turn Resolution */}
+              <div className="intro-right">
+                <h4>Your Turn – Write Your Resolution Paragraph</h4>
+
+                <label>Sentence 1 – Life After the Problem</label>
+                <div className="helper">
+                  <strong>Ideas:</strong> Show what things look like now the problem is solved.
+                  <strong>Sentence starters:</strong> In the end…, Later that day…, From that day on…
+                </div>
+                <textarea
+                  className="s1"
+                  spellCheck="true"
+                  value={resSentences[0]}
+                  onChange={e => updateResSentence(0, e.target.value)}
+                />
+                <div className="fb">
+                  {resFeedback[0].length === 0
+                    ? <em>No feedback yet.</em>
+                    : resFeedback[0].map((f, i) => <div key={i}>{f}</div>)}
+                </div>
+
+                <label>Sentence 2 – Lesson or Realisation (Figurative Language)</label>
+                <div className="helper">
+                  <strong>Ideas:</strong> Explain what the character learnt or now understands.
+                  <strong>Figurative language:</strong> Use a simile or metaphor to explain the lesson, e.g. “Solving problems was like…”.
+                </div>
+                <textarea
+                  className="s2"
+                  spellCheck="true"
+                  value={resSentences[1]}
+                  onChange={e => updateResSentence(1, e.target.value)}
+                />
+                <div className="fb">
+                  {resFeedback[1].length === 0
+                    ? <em>No feedback yet.</em>
+                    : resFeedback[1].map((f, i) => <div key={i}>{f}</div>)}
+                </div>
+
+                <label>Sentence 3 – Feelings at the End</label>
+                <div className="helper">
+                  <strong>Ideas:</strong> Show how the character feels now – inside their mind and body.
+                  <strong>Emotion words:</strong> relieved, proud, peaceful, excited, curious.
+                </div>
+                <textarea
+                  className="s3"
+                  spellCheck="true"
+                  value={resSentences[2]}
+                  onChange={e => updateResSentence(2, e.target.value)}
+                />
+                <div className="fb">
+                  {resFeedback[2].length === 0
+                    ? <em>No feedback yet.</em>
+                    : resFeedback[2].map((f, i) => <div key={i}>{f}</div>)}
+                </div>
+
+                <label>Sentence 4 – Closing Sentence</label>
+                <div className="helper">
+                  <strong>Ideas:</strong> Link back to the beginning or leave the reader with a final thought.
+                  <strong>Sentence starters:</strong> From that moment on…, Little did I know…, That was the day when…
+                </div>
+                <textarea
+                  className="s4"
+                  spellCheck="true"
+                  value={resSentences[3]}
+                  onChange={e => updateResSentence(3, e.target.value)}
+                />
+                <div className="fb">
+                  {resFeedback[3].length === 0
+                    ? <em>No feedback yet.</em>
+                    : resFeedback[3].map((f, i) => <div key={i}>{f}</div>)}
+                </div>
+
+                <div className="btns">
+                  <button className="check" type="button" onClick={checkRes}>
+                    Check spelling, punctuation, and capitalisation
+                  </button>
+                  <button className="read" type="button" onClick={readAloudRes}>
+                    Read aloud
+                  </button>
+                  <button className="copy" type="button" onClick={copyRes}>
+                    Copy paragraph
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    const root = ReactDOM.createRoot(document.getElementById("root"));
+    root.render(<IntroHelper />);
+  </script>
+</body>
+</html>
