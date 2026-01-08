@@ -1,0 +1,1418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Morpheme Game – Term 1</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <style>
+    :root {
+      --bg: #f7f7fb;
+      --card-bg: #ffffff;
+      --accent: #2b6cb0;
+      --accent-soft: #ebf4ff;
+      --correct: #2f855a;
+      --incorrect: #c53030;
+      --border: #d0d0e0;
+      --text-main: #13213c;
+      --text-muted: #55596b;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text-main);
+    }
+
+    .page {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 16px 12px 40px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 12px;
+    }
+
+    header h1 {
+      font-size: 1.4rem;
+      margin: 0;
+    }
+
+    header p {
+      margin: 4px 0 0;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    .nav-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin: 10px 0 16px;
+      flex-wrap: wrap;
+    }
+
+    .nav-bar button {
+      flex: 1 1 80px;
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: #fff;
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+
+    .nav-bar button.primary {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    .nav-bar button:active {
+      transform: scale(0.98);
+    }
+
+    .progress {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      text-align: right;
+      flex: 1 1 100%;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      padding: 14px 14px 10px;
+      margin-bottom: 12px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+    }
+
+    .card-title {
+      font-size: 1rem;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .card-title span.label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--accent);
+      background: var(--accent-soft);
+      padding: 2px 6px;
+      border-radius: 999px;
+    }
+
+    .morpheme-main {
+      font-size: 1.6rem;
+      font-weight: 700;
+    }
+
+    .examples { display: none; }
+
+    .question-text {
+      font-size: 0.95rem;
+      margin: 4px 0 10px;
+    }
+
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .option {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: #fff;
+      cursor: pointer;
+      font-size: 0.95rem;
+      min-height: 38px;
+    }
+
+    .option .tick {
+      font-size: 0.95rem;
+      width: 18px;
+      text-align: center;
+    }
+
+    .option.correct-selected {
+      border-color: var(--correct);
+      background: #f0fff4;
+      color: var(--correct);
+      font-weight: 600;
+    }
+
+    .option.incorrect-selected {
+      border-color: var(--incorrect);
+      background: #fff5f5;
+      color: var(--incorrect);
+    }
+
+    .feedback {
+      font-size: 0.85rem;
+      margin-top: 6px;
+      min-height: 18px;
+    }
+
+    .feedback.correct { color: var(--correct); }
+    .feedback.incorrect { color: var(--incorrect); }
+
+    /* Part 2 */
+
+    .puzzle-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+
+    .puzzle-word {
+      font-weight: 600;
+      font-size: 1rem;
+    }
+
+    .puzzle-instruction {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .tile-bank {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+
+    .tile {
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--accent);
+      background: #fff;
+      font-size: 0.9rem;
+      cursor: pointer;
+      user-select: none;
+      touch-action: manipulation;
+      white-space: nowrap;
+    }
+
+    .tile.selected {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .columns {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    @media (min-width: 720px) {
+      .columns {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+    }
+
+    .drop-column {
+      border-radius: 10px;
+      border: 1px dashed var(--border);
+      min-height: 70px;
+      padding: 4px 6px 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-size: 0.8rem;
+      touch-action: manipulation;
+    }
+
+    .drop-column-header {
+      font-weight: 600;
+      font-size: 0.8rem;
+      margin-bottom: 2px;
+      color: var(--text-muted);
+    }
+
+    .drop-column[data-column-type="prefix"] {
+      background: #e6ffed;   /* light green */
+    }
+
+    .drop-column[data-column-type="root"] {
+      background: #ffe6f0;   /* light pink */
+    }
+
+    .drop-column[data-column-type="suffix"] {
+      background: #fff9d9;   /* light yellow */
+    }
+
+    .drop-column .tile {
+      border-radius: 999px;
+    }
+
+    .puzzle-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .puzzle-buttons button {
+      flex: 1 1 80px;
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: #fff;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+
+    .puzzle-buttons button.primary {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    .puzzle-feedback {
+      font-size: 0.85rem;
+      margin-top: 6px;
+      min-height: 18px;
+    }
+
+    .puzzle-feedback.correct { color: var(--correct); }
+    .puzzle-feedback.incorrect { color: var(--incorrect); }
+
+    .small-note {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    #endGame {
+      margin-top: 14px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px dashed var(--border);
+      background: #fefcf5;
+      font-size: 0.9rem;
+      display: none;
+    }
+
+    #endGame button {
+      margin-top: 8px;
+      padding: 6px 10px;
+      border-radius: 8px;
+      border: 1px solid var(--accent);
+      background: var(--accent);
+      color: #fff;
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <h1>Level 1 Morpheme Game – Term 1</h1>
+      <p>Part 1: meanings &nbsp;•&nbsp; Part 2: sort morphemes into prefix, root, suffix</p>
+    </header>
+
+    <div class="nav-bar">
+      <button id="prevBtn">◀ Previous</button>
+      <button id="nextBtn" class="primary">Next ▶</button>
+      <div class="progress" id="progressText"></div>
+    </div>
+
+    <!-- Part 1 -->
+    <section class="card" id="part1">
+      <div class="card-title">
+        <div>
+          <div class="morpheme-main" id="morphemeText"></div>
+          <div class="examples" id="examplesText"></div>
+        </div>
+        <span class="label" id="typeLabel"></span>
+      </div>
+
+      <div class="question-text">
+        What does this morpheme mean?
+      </div>
+
+      <div class="options" id="optionsContainer"></div>
+
+      <div class="feedback" id="feedbackPart1"></div>
+    </section>
+
+    <!-- Part 2 -->
+    <section class="card" id="part2">
+      <div class="puzzle-header">
+        <div class="puzzle-word">Build the word</div>
+        <div class="puzzle-instruction">
+          Tap a tile, then tap a column to move it.
+        </div>
+      </div>
+
+      <div class="tile-bank" id="tileBank"></div>
+
+      <div class="columns">
+        <div class="drop-column" data-column-type="prefix">
+          <div class="drop-column-header">Prefix</div>
+        </div>
+        <div class="drop-column" data-column-type="root">
+          <div class="drop-column-header">Root</div>
+        </div>
+        <div class="drop-column" data-column-type="suffix" data-suffix-index="1">
+          <div class="drop-column-header">Suffix 1</div>
+        </div>
+        <div class="drop-column" data-column-type="suffix" data-suffix-index="2">
+          <div class="drop-column-header">Suffix 2</div>
+        </div>
+      </div>
+
+      <div class="puzzle-buttons">
+        <button id="checkPuzzleBtn" class="primary">Check</button>
+        <button id="showAnswerBtn">Show correct</button>
+        <button id="resetPuzzleBtn">Reset tiles</button>
+      </div>
+
+      <div class="puzzle-feedback" id="puzzleFeedback"></div>
+      <div class="small-note">
+        Tiles come from the example words for this morpheme.
+      </div>
+
+      <div id="endGame">
+        <div>You’ve reached the end of the Term 1 morpheme game!</div>
+        <button id="tryAgainBtn">Try again from the beginning</button>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    // -----------------------------
+    // Term 1 morphemes
+    // -----------------------------
+    const term1Morphemes = [
+      // Prefixes
+      { id: "t1_pref_ad",  morpheme: "ad",  type: "prefix",
+        meaning: "to, towards, near",
+        examples: ["advance", "adjoining", "advantage"] },
+      { id: "t1_pref_at",  morpheme: "at",  type: "prefix",
+        meaning: "to, towards, near",
+        examples: ["attract", "attractive", "attributing"] },
+      { id: "t1_pref_com", morpheme: "com", type: "prefix",
+        meaning: "with, together",
+        examples: ["complete", "compress", "communicate"] },
+      { id: "t1_pref_con", morpheme: "con", type: "prefix",
+        meaning: "with, together",
+        examples: ["connect", "constructing", "reconstruction"] },
+      { id: "t1_pref_de",  morpheme: "de",  type: "prefix",
+        meaning: "un, down, off, totally, out, away",
+        examples: ["decode", "deescalate", "deconstruct"] },
+      { id: "t1_pref_dis", morpheme: "dis", type: "prefix",
+        meaning: "away, apart",
+        examples: ["disrupt", "distract", "disruptions"] },
+      { id: "t1_pref_ex",  morpheme: "ex",  type: "prefix",
+        meaning: "out, away",
+        examples: ["export", "exportable", "expression"] },
+      { id: "t1_pref_e",   morpheme: "e",   type: "prefix",
+        meaning: "out, away",
+        examples: ["erupt", "eject", "eruption"] },
+      { id: "t1_pref_im_in", morpheme: "im", type: "prefix",
+        meaning: "in, into, on, upon",
+        examples: ["import", "impress", "imprinting"] },
+      { id: "t1_pref_in_in", morpheme: "in", type: "prefix",
+        meaning: "in, into, on, upon",
+        examples: ["inject", "inside", "include"] },
+      { id: "t1_pref_im_not", morpheme: "im", type: "prefix",
+        meaning: "not",
+        examples: ["impure", "immature", "impossible"] },
+      { id: "t1_pref_in_not", morpheme: "in", type: "prefix",
+        meaning: "not",
+        examples: ["inactive", "incomplete", "inaccessible"] },
+      { id: "t1_pref_ob",  morpheme: "ob",  type: "prefix",
+        meaning: "in front of, towards, against",
+        examples: ["object", "obstruct", "obstacle"] },
+      { id: "t1_pref_pro", morpheme: "pro", type: "prefix",
+        meaning: "forward",
+        examples: ["project", "projection", "protraction"] },
+      { id: "t1_pref_re",  morpheme: "re",  type: "prefix",
+        meaning: "back, again",
+        examples: ["report", "retract", "reconstruct"] },
+      { id: "t1_pref_sub", morpheme: "sub", type: "prefix",
+        meaning: "under",
+        examples: ["subject", "subtraction", "subtractors"] },
+      { id: "t1_pref_sup", morpheme: "sup", type: "prefix",
+        meaning: "under",
+        examples: ["suppress", "suppression"] },
+      { id: "t1_pref_tele", morpheme: "tele", type: "prefix",
+        meaning: "far",
+        examples: ["teleport", "telephone", "telecommunication"] },
+      { id: "t1_pref_trans", morpheme: "trans", type: "prefix",
+        meaning: "beyond, across",
+        examples: ["transfer", "transport", "transaction"] },
+      { id: "t1_pref_un", morpheme: "un", type: "prefix",
+        meaning: "opposite of, not",
+        examples: ["undo", "unkind", "undoing"] },
+
+      // Roots
+      { id: "t1_root_act", morpheme: "act", type: "root",
+        meaning: "to do",
+        examples: ["active", "reaction", "distraction"] },
+      { id: "t1_root_do", morpheme: "do", type: "root",
+        meaning: "to perform or carry out an action",
+        examples: ["redo", "undo", "undoing"] },
+      { id: "t1_root_hope", morpheme: "hope", type: "root",
+        meaning: "to wish that something you want will happen",
+        examples: ["hopeful", "hopeless", "hopefully"] },
+      { id: "t1_root_neighbour", morpheme: "neighbour", type: "root",
+        meaning: "someone who lives nearby",
+        examples: ["neighbours", "neighboured", "unneighbourly"] },
+      { id: "t1_root_port", morpheme: "port", type: "root",
+        meaning: "to carry",
+        examples: ["report", "portable", "transporting"] },
+      { id: "t1_root_press", morpheme: "press", type: "root",
+        meaning: "to press or hold tight",
+        examples: ["pressure", "expressively", "compressing"] },
+      { id: "t1_root_ject", morpheme: "ject", type: "root",
+        meaning: "to throw",
+        examples: ["object", "injected", "projectors"] },
+      { id: "t1_root_kind", morpheme: "kind", type: "root",
+        meaning: "gentle, caring, helpful",
+        examples: ["kinder", "kindness", "unkind"] },
+      { id: "t1_root_rupt", morpheme: "rupt", type: "root",
+        meaning: "to break",
+        examples: ["erupt", "disrupt", "disruptions"] },
+      { id: "t1_root_stroy", morpheme: "stroy", type: "root",
+        meaning: "to build or pile up",
+        examples: ["destroy", "destroyers", "destroying"] },
+      { id: "t1_root_struct", morpheme: "struct", type: "root",
+        meaning: "to build or pile up",
+        examples: ["instruct", "construct", "obstructed"] },
+      { id: "t1_root_tract", morpheme: "tract", type: "root",
+        meaning: "to pull",
+        examples: ["tractor", "subtract", "attractive"] },
+
+      // Suffixes
+      { id: "t1_suf_able", morpheme: "able", type: "suffix",
+        meaning: "capable of",
+        examples: ["portable", "destroyable"] },
+      { id: "t1_suf_ed", morpheme: "ed", type: "suffix",
+        meaning: "past tense",
+        examples: ["exported", "disrupted", "compressed"] },
+      { id: "t1_suf_er_comp", morpheme: "er", type: "suffix",
+        meaning: "comparison",
+        examples: ["taller", "faster", "kinder"] },
+      { id: "t1_suf_er_agent", morpheme: "er", type: "suffix",
+        meaning: "one who does or makes",
+        examples: ["driver", "reporter", "importer"] },
+      { id: "t1_suf_es", morpheme: "es", type: "suffix",
+        meaning: "plural; third person",
+        examples: ["wishes", "brushes", "matches"] },
+      { id: "t1_suf_est", morpheme: "est", type: "suffix",
+        meaning: "superlative",
+        examples: ["tallest", "fastest", "kindest"] },
+      { id: "t1_suf_ful", morpheme: "ful", type: "suffix",
+        meaning: "full of",
+        examples: ["careful", "hopeful", "meaningful"] },
+      { id: "t1_suf_ible", morpheme: "ible", type: "suffix",
+        meaning: "capable of",
+        examples: ["accessible", "compressible", "indestructible"] },
+      { id: "t1_suf_hood", morpheme: "hood", type: "suffix",
+        meaning: "state or condition of being",
+        examples: ["childhood", "likelihood", "neighbourhood"] },
+      { id: "t1_suf_ing", morpheme: "ing", type: "suffix",
+        meaning: "continuous past tense verb",
+        examples: ["flying", "distracting", "interconnecting"] },
+      { id: "t1_suf_ion", morpheme: "ion", type: "suffix",
+        meaning: "noun of action",
+        examples: ["reaction", "redirection", "information"] },
+      { id: "t1_suf_ive", morpheme: "ive", type: "suffix",
+        meaning: "having the quality or tendency of",
+        examples: ["active", "proactively", "obstructive"] },
+      { id: "t1_suf_less", morpheme: "less", type: "suffix",
+        meaning: "lacking, not having",
+        examples: ["careless", "harmless", "worthless"] },
+      { id: "t1_suf_ly", morpheme: "ly", type: "suffix",
+        meaning: "having the quality of",
+        examples: ["kindly", "loudly", "sensibly"] },
+      { id: "t1_suf_ness", morpheme: "ness", type: "suffix",
+        meaning: "quality or state of",
+        examples: ["kindness", "happiness", "thoughtfulness"] },
+      { id: "t1_suf_or", morpheme: "or", type: "suffix",
+        meaning: "one who does or makes",
+        examples: ["projector", "transactor", "communicator"] },
+      { id: "t1_suf_s", morpheme: "s", type: "suffix",
+        meaning: "plural; third person",
+        examples: ["instructors", "thoughts", "objects"] },
+      { id: "t1_suf_ure", morpheme: "ure", type: "suffix",
+        meaning: "action or process",
+        examples: ["pressure", "sculpture", "departure"] }
+    ];
+
+    const prefixList = term1Morphemes.filter(m => m.type === "prefix");
+    const rootList   = term1Morphemes.filter(m => m.type === "root");
+    const suffixList = term1Morphemes.filter(m => m.type === "suffix");
+
+    // -----------------------------
+    // Segmentation overrides – Term 1
+    // -----------------------------
+    const segmentationOverrides = {
+      // trib-ute
+      "tribute": [
+        { text: "trib", type: "root" },
+        { text: "ute", type: "suffix" }
+      ],
+
+      // com-mun-ic-ate
+      "communicate": [
+        { text: "com", type: "prefix" },
+        { text: "munic", type: "root" },
+        { text: "ate", type: "suffix" }
+      ],
+
+      // com-plete and in-com-plete
+      "complete": [
+        { text: "com", type: "prefix" },
+        { text: "plete", type: "root" }
+      ],
+      "incomplete": [
+        { text: "in", type: "prefix" },
+        { text: "com", type: "prefix" },
+        { text: "plete", type: "root" }
+      ],
+
+      // tract-or and subtractors
+      "tractor": [
+        { text: "tract", type: "root" },
+        { text: "or", type: "suffix" }
+      ],
+      "subtractors": [
+        { text: "sub", type: "prefix" },
+        { text: "tract", type: "root" },
+        { text: "or", type: "suffix" },
+        { text: "s", type: "suffix" }
+      ],
+
+      // hope-ful
+      "hopeful": [
+        { text: "hope", type: "root" },
+        { text: "ful", type: "suffix" }
+      ],
+
+      // mean-ing / meaning-ful
+      "meaning": [
+        { text: "mean", type: "root" },
+        { text: "ing", type: "suffix" }
+      ],
+      "meaningful": [
+        { text: "mean", type: "root" },
+        { text: "ing", type: "suffix" },
+        { text: "ful", type: "suffix" }
+      ],
+
+      // de-struct
+      "destruct": [
+        { text: "de", type: "prefix" },
+        { text: "struct", type: "root" }
+      ],
+
+      // form-at
+      "format": [
+        { text: "form", type: "root" },
+        { text: "at", type: "suffix" }
+      ],
+
+      // act-ive and in-act-ive
+      "active": [
+        { text: "act", type: "root" },
+        { text: "ive", type: "suffix" }
+      ],
+      "inactive": [
+        { text: "in", type: "prefix" },
+        { text: "act", type: "root" },
+        { text: "ive", type: "suffix" }
+      ],
+
+      // though(t)-ful / though(t)-ful-ness
+      "thoughtful": [
+        { text: "thought", type: "root" },
+        { text: "ful", type: "suffix" }
+      ],
+      "thoughtfulness": [
+        { text: "thought", type: "root" },
+        { text: "ful", type: "suffix" },
+        { text: "ness", type: "suffix" }
+      ],
+
+      // Escalate / deescalate
+      "escalate": [
+        { text: "e", type: "prefix" },
+        { text: "scal", type: "root" },
+        { text: "ate", type: "suffix" }
+      ],
+      "deescalate": [
+        { text: "de", type: "prefix" },
+        { text: "e", type: "prefix" },
+        { text: "scal", type: "root" },
+        { text: "ate", type: "suffix" }
+      ],
+
+      // con-struct variants
+      "construct": [
+        { text: "con", type: "prefix" },
+        { text: "struct", type: "root" }
+      ],
+      "constructing": [
+        { text: "con", type: "prefix" },
+        { text: "struct", type: "root" },
+        { text: "ing", type: "suffix" }
+      ],
+      "deconstruct": [
+        { text: "de", type: "prefix" },
+        { text: "construct", type: "root" }
+      ],
+      "reconstruct": [
+        { text: "re", type: "prefix" },
+        { text: "construct", type: "root" }
+      ],
+      "reconstruction": [
+        { text: "re", type: "prefix" },
+        { text: "con", type: "prefix" },
+        { text: "struct", type: "root" },
+        { text: "ion", type: "suffix" }
+      ],
+      "indestructible": [
+        { text: "in", type: "prefix" },
+        { text: "de", type: "prefix" },
+        { text: "struct", type: "root" },
+        { text: "ible", type: "suffix" }
+      ],
+
+      // rupt / disruptions
+      "eruption": [
+        { text: "e", type: "prefix" },
+        { text: "rupt", type: "root" },
+        { text: "ion", type: "suffix" }
+      ],
+      "disruption": [
+        { text: "dis", type: "prefix" },
+        { text: "rupt", type: "root" },
+        { text: "ion", type: "suffix" }
+      ],
+      "disruptions": [
+        { text: "dis", type: "prefix" },
+        { text: "rupt", type: "root" },
+        { text: "ion", type: "suffix" },
+        { text: "s", type: "suffix" }
+      ],
+
+      // de-stroy-er variants
+      "destroy": [
+        { text: "de", type: "prefix" },
+        { text: "stroy", type: "root" }
+      ],
+      "destroyer": [
+        { text: "de", type: "prefix" },
+        { text: "stroy", type: "root" },
+        { text: "er", type: "suffix" }
+      ],
+      "destroyers": [
+        { text: "de", type: "prefix" },
+        { text: "stroy", type: "root" },
+        { text: "er", type: "suffix" },
+        { text: "s", type: "suffix" }
+      ],
+      "destroying": [
+        { text: "de", type: "prefix" },
+        { text: "stroy", type: "root" },
+        { text: "ing", type: "suffix" }
+      ],
+
+      // con-nect / inter-connect / dis-connect
+      "connect": [
+        { text: "con", type: "prefix" },
+        { text: "nect", type: "root" }
+      ],
+      "interconnect": [
+        { text: "inter", type: "prefix" },
+        { text: "connect", type: "root" }
+      ],
+      "disconnect": [
+        { text: "dis", type: "prefix" },
+        { text: "connect", type: "root" }
+      ],
+      "interconnecting": [
+        { text: "inter", type: "prefix" },
+        { text: "connect", type: "root" },
+        { text: "ing", type: "suffix" }
+      ],
+
+      // press / pressure etc
+      "pressure": [
+        { text: "press", type: "root" },
+        { text: "ure", type: "suffix" }
+      ],
+      "expressively": [
+        { text: "ex", type: "prefix" },
+        { text: "press", type: "root" },
+        { text: "ive", type: "suffix" },
+        { text: "ly", type: "suffix" }
+      ],
+      "compressible": [
+        { text: "com", type: "prefix" },
+        { text: "press", type: "root" },
+        { text: "ible", type: "suffix" }
+      ],
+
+      // proj-ect-or-s
+      "projectors": [
+        { text: "pro", type: "prefix" },
+        { text: "ject", type: "root" },
+        { text: "or", type: "suffix" },
+        { text: "s", type: "suffix" }
+      ],
+
+      // access / accessible / inaccessible
+      "access": [
+        { text: "ac", type: "prefix" },
+        { text: "cess", type: "root" }
+      ],
+      "accessible": [
+        { text: "ac", type: "prefix" },
+        { text: "cess", type: "root" },
+        { text: "ible", type: "suffix" }
+      ],
+      "inaccessible": [
+        { text: "in", type: "prefix" },
+        { text: "ac", type: "prefix" },
+        { text: "cess", type: "root" },
+        { text: "ible", type: "suffix" }
+      ],
+
+      // transportable (if used elsewhere)
+      "transportable": [
+        { text: "trans", type: "prefix" },
+        { text: "port", type: "root" },
+        { text: "able", type: "suffix" }
+      ],
+
+      // instructors – in-struct-or-s
+      "instructors": [
+        { text: "in", type: "prefix" },
+        { text: "struct", type: "root" },
+        { text: "or", type: "suffix" },
+        { text: "s", type: "suffix" }
+      ],
+
+      // sens-ib-ly
+      "sensibly": [
+        { text: "sens", type: "root" },
+        { text: "ib", type: "suffix" },
+        { text: "ly", type: "suffix" }
+      ],
+
+      // di-rect, di-rect-ion, re-di-rect-ion
+      "direct": [
+        { text: "di", type: "prefix" },
+        { text: "rect", type: "root" }
+      ],
+      "direction": [
+        { text: "di", type: "prefix" },
+        { text: "rect", type: "root" },
+        { text: "ion", type: "suffix" }
+      ],
+      "redirection": [
+        { text: "re", type: "prefix" },
+        { text: "di", type: "prefix" },
+        { text: "rect", type: "root" },
+        { text: "ion", type: "suffix" }
+      ],
+
+      // trans-fer
+      "transfer": [
+        { text: "trans", type: "prefix" },
+        { text: "fer", type: "root" }
+      ]
+    };
+
+    // -----------------------------
+    // State & DOM
+    // -----------------------------
+    let currentIndex = 0;
+    let selectedTileEl = null;
+    let hasRenderedOnce = false;
+
+    const morphemeTextEl     = document.getElementById("morphemeText");
+    const typeLabelEl        = document.getElementById("typeLabel");
+    const optionsContainerEl = document.getElementById("optionsContainer");
+    const feedbackPart1El    = document.getElementById("feedbackPart1");
+    const progressTextEl     = document.getElementById("progressText");
+
+    const tileBankEl         = document.getElementById("tileBank");
+    const puzzleFeedbackEl   = document.getElementById("puzzleFeedback");
+
+    const prevBtn            = document.getElementById("prevBtn");
+    const nextBtn            = document.getElementById("nextBtn");
+    const checkPuzzleBtn     = document.getElementById("checkPuzzleBtn");
+    const showAnswerBtn      = document.getElementById("showAnswerBtn");
+    const resetPuzzleBtn     = document.getElementById("resetPuzzleBtn");
+    const tryAgainBtn        = document.getElementById("tryAgainBtn");
+    const endGameEl          = document.getElementById("endGame");
+
+    const dropColumns        = document.querySelectorAll(".drop-column");
+    const columnsContainer   = document.querySelector(".columns");
+    const prefixCol          = document.querySelector('.drop-column[data-column-type="prefix"]');
+    const rootCol            = document.querySelector('.drop-column[data-column-type="root"]');
+    const suffixCol1         = document.querySelector('.drop-column[data-column-type="suffix"][data-suffix-index="1"]');
+    const suffixCol2         = document.querySelector('.drop-column[data-column-type="suffix"][data-suffix-index="2"]');
+
+    const part1State   = [];
+    const puzzleStates = [];
+
+    // -----------------------------
+    // Build meanings & options
+    // -----------------------------
+    const uniqueMeanings = Array.from(
+      new Set(term1Morphemes.map(m => m.meaning))
+    );
+
+    const questionConfigs = [];
+    (function buildQuestionConfigs() {
+      let posCycle = -1;
+      term1Morphemes.forEach(item => {
+        const distractorMeanings = uniqueMeanings.filter(m => m !== item.meaning);
+        const shuffled = shuffle(distractorMeanings);
+        const d1 = shuffled[0] || item.meaning;
+        const d2 = shuffled[1] || item.meaning;
+
+        posCycle = (posCycle + 1) % 3;
+        const correctPos = posCycle;
+
+        const optionTexts = [];
+        let dIndex = 0;
+        for (let i = 0; i < 3; i++) {
+          if (i === correctPos) {
+            optionTexts.push({ text: item.meaning, correct: true });
+          } else {
+            optionTexts.push({ text: [d1, d2][dIndex++], correct: false });
+          }
+        }
+        questionConfigs.push({ options: optionTexts });
+      });
+    })();
+
+    // -----------------------------
+    // Helpers
+    // -----------------------------
+    function shuffle(array) {
+      const arr = array.slice();
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    function capitaliseFirst(str) {
+      if (!str) return "";
+      return str.charAt(0).toUpperCase() + str.slice(1);
+    }
+
+    function updateSuffixColumns(needSecond) {
+      const suffixCols = document.querySelectorAll('.drop-column[data-column-type="suffix"]');
+      if (suffixCols.length > 1) {
+        suffixCols[1].style.display = needSecond ? "" : "none";
+      }
+    }
+
+    function applyColumnOrder(orderKeys) {
+      const map = {
+        prefix: prefixCol,
+        root: rootCol,
+        suffix1: suffixCol1,
+        suffix2: suffixCol2
+      };
+      orderKeys.forEach(key => {
+        const col = map[key];
+        if (col && col.parentElement === columnsContainer) {
+          columnsContainer.appendChild(col);
+        }
+      });
+    }
+
+    function showEndPanelIfNeeded() {
+      if (currentIndex === term1Morphemes.length - 1) {
+        endGameEl.style.display = "block";
+      } else {
+        endGameEl.style.display = "none";
+      }
+    }
+
+    function saveCurrentState(index) {
+      if (!hasRenderedOnce) return;
+
+      // Part 1
+      const options = optionsContainerEl.querySelectorAll(".option");
+      let selectedIdx = -1;
+      options.forEach((opt, i) => {
+        if (opt.classList.contains("correct-selected") ||
+            opt.classList.contains("incorrect-selected")) {
+          selectedIdx = i;
+        }
+      });
+      if (selectedIdx !== -1) {
+        part1State[index] = { selectedIndex: selectedIdx };
+      }
+
+      // Part 2
+      const allTiles = document.querySelectorAll(".tile-bank .tile, .drop-column .tile");
+      if (allTiles.length > 0) {
+        const tilesData = Array.from(allTiles).map(tile => {
+          const parent = tile.parentElement;
+          let column = "bank";
+          if (parent.classList.contains("drop-column")) {
+            column = parent.dataset.columnType;
+          }
+          return {
+            text: tile.textContent,
+            type: tile.dataset.type,
+            column: column
+          };
+        });
+        puzzleStates[index] = { tiles: tilesData };
+      }
+    }
+
+    // -----------------------------
+    // Per-question tile overrides (by index)
+    // -----------------------------
+    function applyQuestionTileOverrides(qIndex, tiles) {
+      // qIndex is 0-based; questions are 1-based
+      const qNumber = qIndex + 1;
+
+      function ensureTile(text, type) {
+        if (!tiles.some(t => t.text === text && t.type === type)) {
+          tiles.push({ text, type });
+        }
+      }
+
+      switch (qNumber) {
+        case 2:
+          // Question 2: trib-ute
+          ensureTile("trib", "root");
+          ensureTile("ute", "suffix");
+          break;
+        case 5:
+        case 15:
+          // Questions 5 & 15: con-struct
+          ensureTile("con", "prefix");
+          ensureTile("struct", "root");
+          break;
+        case 18:
+        case 48:
+          // Questions 18 & 48: com-mun-ic-ate
+          ensureTile("com", "prefix");
+          ensureTile("munic", "root");
+          ensureTile("ate", "suffix");
+          break;
+        case 23:
+          // Question 23: hope-ful
+          ensureTile("hope", "root");
+          ensureTile("ful", "suffix");
+          break;
+        case 42:
+          // Question 42: con-nect
+          ensureTile("con", "prefix");
+          ensureTile("nect", "root");
+          break;
+        case 44:
+          // Question 44: act-ive
+          ensureTile("act", "root");
+          ensureTile("ive", "suffix");
+          break;
+      }
+
+      return tiles;
+    }
+
+    // -----------------------------
+    // Part 1 – meanings
+    // -----------------------------
+    function renderPart1() {
+      const item = term1Morphemes[currentIndex];
+      const config = questionConfigs[currentIndex];
+
+      morphemeTextEl.textContent = item.morpheme;
+      typeLabelEl.textContent = capitaliseFirst(item.type);
+
+      optionsContainerEl.innerHTML = "";
+      feedbackPart1El.textContent = "";
+      feedbackPart1El.className = "feedback";
+
+      config.options.forEach((opt, idx) => {
+        const div = document.createElement("div");
+        div.className = "option";
+        div.dataset.correct = opt.correct ? "true" : "false";
+        div.dataset.index = idx;
+
+        const tickSpan = document.createElement("span");
+        tickSpan.className = "tick";
+        tickSpan.textContent = "";
+
+        const labelSpan = document.createElement("span");
+        labelSpan.textContent = opt.text;
+
+        div.appendChild(tickSpan);
+        div.appendChild(labelSpan);
+
+        div.addEventListener("click", () => handleOptionClick(div));
+        optionsContainerEl.appendChild(div);
+      });
+
+      const saved = part1State[currentIndex];
+      if (saved && typeof saved.selectedIndex === "number") {
+        const opts = optionsContainerEl.querySelectorAll(".option");
+        const optEl = opts[saved.selectedIndex];
+        if (optEl) {
+          handleOptionClick(optEl, true);
+        }
+      }
+
+      progressTextEl.textContent =
+        "Morpheme " + (currentIndex + 1) + " of " + term1Morphemes.length;
+
+      showEndPanelIfNeeded();
+    }
+
+    function handleOptionClick(optionEl, isRestoring = false) {
+      const isCorrect = optionEl.dataset.correct === "true";
+
+      const allOptions = optionsContainerEl.querySelectorAll(".option");
+      allOptions.forEach(opt => {
+        opt.classList.remove("correct-selected", "incorrect-selected");
+        const tickEl = opt.querySelector(".tick");
+        if (tickEl) tickEl.textContent = "";
+      });
+
+      if (isCorrect) {
+        optionEl.classList.add("correct-selected");
+        const tickEl = optionEl.querySelector(".tick");
+        if (tickEl) tickEl.textContent = "✓";
+        feedbackPart1El.textContent = "Correct!";
+        feedbackPart1El.className = "feedback correct";
+      } else {
+        optionEl.classList.add("incorrect-selected");
+        const tickEl = optionEl.querySelector(".tick");
+        if (tickEl) tickEl.textContent = "✗";
+        feedbackPart1El.textContent = "Not quite. Try again.";
+        feedbackPart1El.className = "feedback incorrect";
+      }
+
+      if (!isRestoring) {
+        const idx = parseInt(optionEl.dataset.index, 10);
+        part1State[currentIndex] = { selectedIndex: idx };
+      }
+    }
+
+    // -----------------------------
+    // Part 2 – tiles
+    // -----------------------------
+    function clearColumns() {
+      dropColumns.forEach(col => {
+        const header = col.querySelector(".drop-column-header");
+        col.innerHTML = "";
+        if (header) col.appendChild(header);
+      });
+      tileBankEl.innerHTML = "";
+      selectedTileEl = null;
+      puzzleFeedbackEl.textContent = "";
+      puzzleFeedbackEl.className = "puzzle-feedback";
+    }
+
+    function segmentWord(word) {
+      const lower = word.toLowerCase();
+      if (segmentationOverrides[lower]) {
+        return segmentationOverrides[lower].map(seg => ({ ...seg }));
+      }
+
+      const wordLower = lower;
+      let prefixSeg = null;
+      let baseLower = wordLower;
+      let baseOrig  = word;
+
+      const sortedPrefixes = prefixList
+        .slice()
+        .sort((a, b) => b.morpheme.length - a.morpheme.length);
+
+      for (const p of sortedPrefixes) {
+        const mor = p.morpheme.toLowerCase();
+        if (wordLower.startsWith(mor)) {
+          prefixSeg = { text: p.morpheme, type: "prefix" };
+          baseLower = wordLower.slice(mor.length);
+          baseOrig  = word.slice(mor.length);
+          break;
+        }
+      }
+
+      let suffixSeg = null;
+      let rootLower = baseLower;
+      let rootOrig  = baseOrig;
+
+      const sortedSuffixes = suffixList
+        .slice()
+        .sort((a, b) => b.morpheme.length - a.morpheme.length);
+
+      for (const s of sortedSuffixes) {
+        const mor = s.morpheme.toLowerCase();
+        if (rootLower.endsWith(mor) && rootLower.length > mor.length) {
+          suffixSeg = { text: s.morpheme, type: "suffix" };
+          rootLower = rootLower.slice(0, -mor.length);
+          rootOrig  = rootOrig.slice(0, -s.morpheme.length);
+          break;
+        }
+      }
+
+      let rootSeg = null;
+      if (rootLower.length > 0) {
+        const matchingRoot = rootList.find(
+          r => r.morpheme.toLowerCase() === rootLower
+        );
+        if (matchingRoot) {
+          rootSeg = { text: matchingRoot.morpheme, type: "root" };
+        } else {
+          rootSeg = { text: rootOrig, type: "root" };
+        }
+      }
+
+      const segments = [];
+      if (prefixSeg) segments.push(prefixSeg);
+      if (rootSeg)   segments.push(rootSeg);
+      if (suffixSeg) segments.push(suffixSeg);
+      return segments;
+    }
+
+    function computeTilesForMorpheme(item) {
+      const tiles = [];
+      const words = item.examples || [];
+
+      words.forEach(word => {
+        const segments = segmentWord(word);
+        segments.forEach(seg => {
+          tiles.push({ text: seg.text, type: seg.type });
+        });
+      });
+
+      const hasCurrent = tiles.some(
+        t => t.text === item.morpheme && t.type === item.type
+      );
+      if (!hasCurrent) {
+        tiles.push({ text: item.morpheme, type: item.type });
+      }
+
+      return tiles;
+    }
+
+    function renderPart2() {
+      const item = term1Morphemes[currentIndex];
+
+      applyColumnOrder(["prefix", "root", "suffix1", "suffix2"]);
+
+      clearColumns();
+
+      let tiles;
+      const saved = puzzleStates[currentIndex];
+      if (saved && saved.tiles && saved.tiles.length) {
+        tiles = saved.tiles;
+      } else {
+        tiles = computeTilesForMorpheme(item);
+        tiles = applyQuestionTileOverrides(currentIndex, tiles);
+      }
+
+      const suffixCount = tiles.filter(t => t.type === "suffix").length;
+      const forceSecondSuffix =
+        currentIndex === 17 || currentIndex === 47; // Q18 & Q48
+
+      const needSecondSuffix = suffixCount > 1 || forceSecondSuffix;
+      updateSuffixColumns(needSecondSuffix);
+
+      const tileList = saved ? tiles : shuffle(tiles);
+
+      tileList.forEach(tileData => {
+        const tileEl = document.createElement("div");
+        tileEl.className = "tile";
+        tileEl.textContent = tileData.text;
+        tileEl.dataset.type = tileData.type;
+
+        if (saved && tileData.column && tileData.column !== "bank") {
+          const targetCol = document.querySelector(
+            '.drop-column[data-column-type="' + tileData.column + '"]'
+          );
+          if (targetCol) {
+            targetCol.appendChild(tileEl);
+          } else {
+            tileBankEl.appendChild(tileEl);
+          }
+        } else {
+          tileBankEl.appendChild(tileEl);
+        }
+
+        tileEl.addEventListener("click", () => handleTileClick(tileEl));
+      });
+
+      showEndPanelIfNeeded();
+    }
+
+    function handleTileClick(tileEl) {
+      if (selectedTileEl === tileEl) {
+        tileEl.classList.remove("selected");
+        selectedTileEl = null;
+        return;
+      }
+      if (selectedTileEl) {
+        selectedTileEl.classList.remove("selected");
+      }
+      tileEl.classList.add("selected");
+      selectedTileEl = tileEl;
+    }
+
+    dropColumns.forEach(col => {
+      col.addEventListener("click", () => {
+        if (!selectedTileEl) return;
+        col.appendChild(selectedTileEl);
+        selectedTileEl.classList.remove("selected");
+        selectedTileEl = null;
+      });
+    });
+
+    function checkPuzzle() {
+      let allCorrect = true;
+
+      const allTiles = document.querySelectorAll(".tile-bank .tile, .drop-column .tile");
+      allTiles.forEach(tile => {
+        tile.style.outline = "none";
+      });
+
+      const placedTiles = document.querySelectorAll(".drop-column .tile");
+      if (placedTiles.length === 0) {
+        puzzleFeedbackEl.textContent = "Move tiles into the columns before checking.";
+        puzzleFeedbackEl.className = "puzzle-feedback incorrect";
+        return;
+      }
+
+      dropColumns.forEach(col => {
+        const colType = col.dataset.columnType;
+        const tiles = col.querySelectorAll(".tile");
+
+        tiles.forEach(tile => {
+          if (colType === tile.dataset.type) {
+            tile.style.outline = "2px solid " +
+              getComputedStyle(document.documentElement)
+                .getPropertyValue("--correct");
+          } else {
+            tile.style.outline = "2px solid " +
+              getComputedStyle(document.documentElement)
+                .getPropertyValue("--incorrect");
+            allCorrect = false;
+          }
+        });
+      });
+
+      if (allCorrect) {
+        puzzleFeedbackEl.textContent = "Well done – all morphemes are in the correct columns!";
+        puzzleFeedbackEl.className = "puzzle-feedback correct";
+      } else {
+        puzzleFeedbackEl.textContent = "Some tiles are in the wrong column. Check the colours and try again.";
+        puzzleFeedbackEl.className = "puzzle-feedback incorrect";
+      }
+    }
+
+    function showCorrectArrangement() {
+      const allTiles = document.querySelectorAll(".tile-bank .tile, .drop-column .tile");
+
+      allTiles.forEach(tile => {
+        const type = tile.dataset.type;
+        const targetCol = document.querySelector(
+          '.drop-column[data-column-type="' + type + '"]'
+        );
+        if (targetCol) {
+          targetCol.appendChild(tile);
+        }
+        tile.style.outline = "2px solid " +
+          getComputedStyle(document.documentElement)
+            .getPropertyValue("--correct");
+      });
+
+      puzzleFeedbackEl.textContent = "Here is one correct way to sort the morphemes.";
+      puzzleFeedbackEl.className = "puzzle-feedback correct";
+    }
+
+    function resetPuzzle() {
+      puzzleStates[currentIndex] = null;
+      renderPart2();
+    }
+
+    function resetAllStates() {
+      for (let i = 0; i < term1Morphemes.length; i++) {
+        part1State[i] = null;
+        puzzleStates[i] = null;
+      }
+    }
+
+    // -----------------------------
+    // Navigation
+    // -----------------------------
+    function goToIndex(newIndex) {
+      let target = newIndex;
+      if (target < 0) target = 0;
+      if (target >= term1Morphemes.length) target = term1Morphemes.length - 1;
+
+      if (hasRenderedOnce) {
+        saveCurrentState(currentIndex);
+      }
+
+      currentIndex = target;
+      renderPart1();
+      renderPart2();
+      hasRenderedOnce = true;
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    prevBtn.addEventListener("click", () => {
+      goToIndex(currentIndex - 1);
+    });
+
+    nextBtn.addEventListener("click", () => {
+      goToIndex(currentIndex + 1);
+    });
+
+    checkPuzzleBtn.addEventListener("click", checkPuzzle);
+    showAnswerBtn.addEventListener("click", showCorrectArrangement);
+    resetPuzzleBtn.addEventListener("click", resetPuzzle);
+
+    tryAgainBtn.addEventListener("click", () => {
+      resetAllStates();
+      goToIndex(0);
+    });
+
+    // -----------------------------
+    // Initial render
+    // -----------------------------
+    goToIndex(0);
+  </script>
+</body>
+</html>
