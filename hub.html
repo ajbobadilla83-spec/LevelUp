@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>LevelUp Hub | Mr B</title>
+  <link rel="stylesheet" href="assets/style.css" />
+</head>
+<body>
+  <div class="bg" aria-hidden="true"></div>
+
+  <main class="wrap">
+    <header class="header">
+      <div class="brand">
+        <div class="logo">⚡</div>
+        <div>
+          <div class="title">LevelUp</div>
+          <div class="by">by Mr B</div>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button id="changeNameBtn" class="btn ghost" type="button">Change name</button>
+      </div>
+    </header>
+
+    <section class="card">
+      <h2 id="welcomeLine">You can do it!!! 💪</h2>
+      <p class="lead">
+        Choose a tool. Do your best. Then earn <strong>PBS points</strong> ⭐
+      </p>
+
+      <div class="pbs-banner">
+        <div class="pbs-left">
+          <div class="pbs-icon">📸</div>
+          <div>
+            <div class="pbs-title">Don’t forget to screenshot and email Mr B</div>
+            <div class="pbs-sub">Screenshot your work/score to earn PBS points ⭐</div>
+          </div>
+        </div>
+        <div class="pbs-right">
+          <div class="sparkle">✨</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="grid" id="toolsGrid">
+      <!-- Tools auto-generated from assets/tools.js -->
+    </section>
+
+    <footer class="footer" id="footerLine"></footer>
+  </main>
+
+  <!-- Launch Modal -->
+  <div id="modal" class="modal" aria-hidden="true">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <h3 id="modalTitle">Ready?</h3>
+      <p id="modalText" class="modal-text"></p>
+      <div class="modal-bigreminder">
+        <span class="camera">📸</span>
+        <span><strong>Don’t forget to screenshot and email Mr B</strong> for PBS points ⭐</span>
+      </div>
+      <div class="modal-actions">
+        <button id="modalCancel" class="btn ghost" type="button">Not yet</button>
+        <a id="modalGo" class="btn primary" href="#">Let’s go! 🚀</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/tools.js"></script>
+  <script src="assets/app.js"></script>
+  <script>
+    LevelUp.initHub();
+  </script>
+</body>
+</html>

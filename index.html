@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>LevelUp by Mr B</title>
+  <link rel="stylesheet" href="assets/style.css" />
+</head>
+<body class="home">
+  <div class="site-bg" aria-hidden="true"></div>
+
+  <header class="nav">
+    <div class="nav-left">
+      <div class="mark">⚡</div>
+      <div>
+        <div class="brand">LevelUp</div>
+        <div class="brand-sub">by Mr B</div>
+      </div>
+    </div>
+    <div class="nav-right">
+      <span class="chip">Year 4</span>
+      <span class="chip chip-glow">PBS Points ⭐</span>
+    </div>
+  </header>
+
+  <main class="page">
+    <section class="hero polished">
+      <div class="hero-left">
+        <div class="kicker">TODAY’S QUEST</div>
+
+        <h1 class="hero-title">
+          Learn. Practice. <span class="glow">Level Up.</span>
+        </h1>
+
+        <p class="hero-lead">
+          Choose a challenge, do your best, and earn rewards.
+          <strong>Screenshot your progress</strong> and email Mr B for <strong>PBS points</strong>.
+        </p>
+
+        <div class="stats-row">
+          <div class="stat">
+            <div class="stat-top">
+              <span class="stat-emoji">🧠</span>
+              <span class="stat-title">Grammar</span>
+            </div>
+            <div class="stat-sub">Streaks + accuracy</div>
+          </div>
+          <div class="stat">
+            <div class="stat-top">
+              <span class="stat-emoji">🧩</span>
+              <span class="stat-title">Morphemes</span>
+            </div>
+            <div class="stat-sub">Word power-ups</div>
+          </div>
+          <div class="stat">
+            <div class="stat-top">
+              <span class="stat-emoji">⚔️</span>
+              <span class="stat-title">Timetables</span>
+            </div>
+            <div class="stat-sub">Brave speed drills</div>
+          </div>
+        </div>
+
+        <div class="big-reminder polished">
+          <div class="big-reminder-icon">📸</div>
+          <div>
+            <div class="big-reminder-title">Don’t forget to screenshot and email Mr B</div>
+            <div class="big-reminder-sub">That’s how you earn PBS points ⭐</div>
+          </div>
+        </div>
+
+        <div class="mission-card">
+          <div class="mission-title">Mission (10 minutes)</div>
+          <ol class="mission-list">
+            <li>Pick <strong>one</strong> tool</li>
+            <li>Practice until you improve</li>
+            <li><strong>Screenshot</strong> your best work</li>
+            <li>Email Mr B for <strong>PBS points</strong> ⭐</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="hero-right">
+        <div class="panel polished">
+          <div class="panel-top">
+            <div class="panel-title">Enter your name to begin</div>
+            <div class="panel-sub">No logins. Just your name.</div>
+          </div>
+
+          <form id="nameForm" class="panel-form">
+            <label for="studentName" class="label">Your name</label>
+            <div class="input-wrap">
+              <span class="input-icon" aria-hidden="true">👤</span>
+              <input
+                id="studentName"
+                class="input input-with-icon"
+                type="text"
+                placeholder="e.g., John"
+                maxlength="30"
+                autocomplete="off"
+                required
+              />
+            </div>
+
+            <button class="btn primary btn-big" type="submit">
+              Enter the Hub <span class="btn-arrow">➜</span>
+            </button>
+          </form>
+
+          <div class="panel-note">
+            Tip: Use your <strong>first name</strong> (or first name + initial).
+          </div>
+
+          <div class="panel-divider"></div>
+
+          <div class="trust-row">
+            <div class="trust">
+              <span class="trust-icon">🔒</span>
+              <span>Nothing is stored online</span>
+            </div>
+            <div class="trust">
+              <span class="trust-icon">⚡</span>
+              <span>Fast, simple, fun</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="spark-card polished">
+          <div class="spark-title">Pro tip</div>
+          <div class="spark-body">
+            When you finish, take your screenshot straight away so you don’t forget.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <span>LevelUp by Mr B • Remember: screenshot + email = PBS points ⭐</span>
+    </footer>
+  </main>
+
+  <!-- Loading overlay -->
+  <div id="loadingOverlay" class="overlay" aria-hidden="true">
+    <div class="overlay-card">
+      <div class="overlay-badge">LEVELUP</div>
+      <div id="overlayTitle" class="overlay-title">Loading…</div>
+      <div class="overlay-sub">Get ready to level up 🎮</div>
+      <div class="bar">
+        <div class="bar-fill"></div>
+      </div>
+      <div class="overlay-note">📸 Don’t forget to screenshot and email Mr B</div>
+    </div>
+  </div>
+
+  <script src="assets/app.js"></script>
+  <script>
+    // Keep your existing storage logic
+    LevelUp.initIndex();
+
+    // Add polished “loading” experience without changing your app.js
+    (function () {
+      const form = document.getElementById("nameForm");
+      const input = document.getElementById("studentName");
+      const overlay = document.getElementById("loadingOverlay");
+      const overlayTitle = document.getElementById("overlayTitle");
+
+      form.addEventListener("submit", () => {
+        // Let LevelUp.initIndex() save the name — we just add the visuals.
+        const name = (input.value || "Legend").trim().slice(0, 30);
+        overlayTitle.textContent = `Welcome, ${name}! Loading your hub…`;
+        overlay.setAttribute("aria-hidden", "false");
+        overlay.classList.add("open");
+      }, { capture: true });
+    })();
+  </script>
+</body>
+</html>
